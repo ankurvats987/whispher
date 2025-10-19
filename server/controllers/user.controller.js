@@ -559,6 +559,10 @@ const sendMail = async (token, email) => {
     });
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    console.log("Sending email to:", email);
+    console.log("From:", process.env.EMAIL_USER);
+    console.log("Frontend URL:", process.env.FRONTEND_URL);
+    console.log("Reset link:", resetLink);
 
     const mailOptions = {
       from: `"Microblogging App" <${process.env.EMAIL_USER}>`,
