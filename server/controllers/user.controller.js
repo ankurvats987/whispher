@@ -556,6 +556,8 @@ const sendMail = async (token, email) => {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      port: 465,
+      secure: true,
     });
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
