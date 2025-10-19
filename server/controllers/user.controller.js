@@ -34,7 +34,7 @@ const setAuthTokens = async (userId, username, res) => {
   // Send the refresh token using secure cookies to the frontend
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     secure: process.env.NODE_ENV === "production",
     maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
   });
@@ -225,11 +225,11 @@ const logoutUser = async (req, res) => {
     user.refreshToken = null;
     await user.save();
 
-    res.clearCookie("refreshToken", {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 0,
+      maxAge: ms(process.env.REFRESH_TOKEN_EXPIRY),
     });
 
     return APIResponse.success("User logged out successfully!", null, 201).send(
