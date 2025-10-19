@@ -10,6 +10,7 @@ cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
 });
 
 export const uploadOnCloudinary = async (localFilePath) => {
@@ -18,10 +19,10 @@ export const uploadOnCloudinary = async (localFilePath) => {
 
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "image",
+      secure: true,
     });
 
     fs.unlinkSync(localFilePath);
-    console.log(response);
     return response;
   } catch (error) {
     fs.unlinkSync(localFilePath);
