@@ -747,11 +747,11 @@ Didn't request this? You can safely ignore this email. Your password will remain
       }
     );
     console.log("Email sent successfully!");
-    console.log("Message ID:", info.messageId);
-    return info;
+    console.log("Message ID:", info?.messageId || "No message ID");
+    return true;
   } catch (error) {
     console.error("Error sending email:", error);
-    throw error;
+    throw new Error(`Failed to send email: ${error.message}`);
   }
 };
 
