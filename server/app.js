@@ -1,15 +1,10 @@
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import userRouter from "./routes/user.route.js";
 import { authenticate } from "./middlewares/authenticate.middleware.js";
 import postRouter from "./routes/post.route.js";
-import { Follows } from "./models/follows.model.js";
-import { upload } from "./middlewares/multer.middleware.js";
-import { uploadOnCloudinary } from "./utils/cloudinary_uploader.js";
-import { User } from "./models/user.model.js";
-import { getFollowedPosts } from "./controllers/post.controller.js";
+import userRouter from "./routes/user.route.js";
 
 dotenv.config({
   path: "./.env",
@@ -19,7 +14,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
     credentials: true,
   })
 );
