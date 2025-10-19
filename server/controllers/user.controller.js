@@ -533,7 +533,7 @@ const resetPassword = async (req, res) => {
       expiresIn: process.env.RESET_PASS_TOKEN_EXPIRY,
     });
 
-    sendMail(token, email);
+    await sendMail(token, email);
 
     return APIResponse.success("Email verified successfully", null, 200).send(
       res
@@ -548,22 +548,23 @@ const resetPassword = async (req, res) => {
   }
 };
 
-const sendMail = (token, email) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+const sendMail = async (token, email) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-  const mailOptions = {
-    from: `"Microblogging App" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: "Reset Your Password",
-    html: `
+    const mailOptions = {
+      from: `"Microblogging App" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Reset Your Password",
+      html: `
       <!DOCTYPE html>
       <html>
         <head>
@@ -717,7 +718,7 @@ const sendMail = (token, email) => {
         </body>
       </html>
     `,
-    text: `
+      text: `
 Reset Your Password
 
 Hi there!
@@ -732,16 +733,26 @@ Didn't request this? You can safely ignore this email. Your password will remain
 
 © ${new Date().getFullYear()} Whisper. All rights reserved.
     `,
-  };
+    };
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log("Error:", error);
-    } else {
-      console.log("Email sent successfully!");
-      console.log("Message ID:", info.messageId);
-    }
-  });
+    const info = await transporter.sendMail(
+      mailOptions,
+      function (error, info) {
+        if (error) {
+          console.log("Error:", error);
+        } else {
+          console.log("Email sent successfully!");
+          console.log("Message ID:", info.messageId);
+        }
+      }
+    );
+    console.log("Email sent successfully!");
+    console.log("Message ID:", info.messageId);
+    return info;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error;
+  }
 };
 
 const verifyResetToken = async (req, res) => {
