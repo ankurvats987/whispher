@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap");
+@import "tailwindcss";
+
+body,
+button,
+input,
+textarea {
+  font-family: "Geist", sans-serif;
+}
+
+@keyframes banner-enter {
+  0% {
+    transform: scale(0.98);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.015);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out;
+}
+
+.animate-banner-enter {
+  animation: banner-enter 0.3s ease-in;
+}

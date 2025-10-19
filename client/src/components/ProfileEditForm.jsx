@@ -1,0 +1,271 @@
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
+import { Button } from "../components/Button";
+import ErrorMessage from "../components/ErrorMessage";
+import { update } from "../features/user/userThunks";
+
+const ProfileEditForm = () => {
+  const [imageFile, setImageFile] = useState(null);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const updateLoading = useSelector((state) => state.user.loading.update);
+
+  const user = useSelector((state) => state.user.user);
+  const [imageUrl, setImageUrl] = useState(user.profilePicture);
+
+  const fileInputRef = useRef();
+
+  const handleInputClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return null;
+
+    const url = URL.createObjectURL(file);
+    setImageFile(file);
+    setImageUrl(url);
+  };
+
+  const {
+    register,
+    setError,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm();
+
+  const onSubmit = async (data) => {
+    try {
+      const formdata = new FormData();
+
+      if (data.fullName && data.fullName !== user.displayName) {
+        formdata.append("displayName", data.fullName);
+      }
+
+      if (data.username && data.username !== user.username) {
+        formdata.append("username", data.username);
+      }
+
+      if (data.desc !== undefined && data.desc !== user.description) {
+        formdata.append("description", data.desc);
+      }
+
+      if (imageFile) {
+        formdata.append("avatar", imageFile);
+      }
+
+      // Check if there are any updates
+      if (![...formdata.keys()].length) {
+        navigate(-1);
+        return;
+      }
+
+      await dispatch(update(formdata)).unwrap();
+      toast.success("Profile updated successfully!");
+
+      if (data.username && data.username !== user.username) {
+        navigate(`/profile/${data.username}`, { replace: true });
+      } else {
+        navigate(-1);
+      }
+    } catch (error) {
+      const errMsg =
+        error?.response?.data?.message || "Failed to update profile";
+
+      setError("root", {
+        type: "manual",
+        message: errMsg,
+      });
+    }
+  };
+  return (
+    <>
+      <main className="min-h-screen p-6 flex  justify-center">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-r from-teal-200/30 to-cyan-200/30 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-gradient-to-r from-rose-200/30 to-purple-200/30 rounded-full blur-3xl"></div>
+          <div className="absolute top-3/4 right-1/3 w-32 h-32 bg-gradient-to-r from-yellow-200/30 to-orange-200/30 rounded-full blur-2xl"></div>
+        </div>
+        <div className="w-full max-w-md">
+          <div className="bg-white/80 text-card-foreground backdrop-blur-sm rounded-2xl shadow-3xl border border-gray-100">
+            <div className="flex flex-col space-y-1.5 p-6 pb-6 text-center">
+              <h3 className="tracking-tight text-2xl font-bold text-gray-800">
+                Edit Profile
+              </h3>
+            </div>
+            <div className="p-6 pt-0 space-y-6">
+              <div className="flex items-center justify-center">
+                <div className="relative group">
+                  <div
+                    className="w-24 h-24 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full flex items-center justify-center cursor-pointer hover:from-gray-300 hover:to-gray-400 transition-colors overflow-hidden"
+                    onClick={handleInputClick}
+                  >
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt="Profile Picture"
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-upload w-8 h-8 text-gray-500"
+                      >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" x2="12" y1="3" y2="15"></line>
+                      </svg>
+                    )}
+                  </div>
+
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-r from-rose-400 to-purple-400 rounded-full flex items-center justify-center cursor-pointer hover:from-rose-500 hover:to-purple-500">
+                    <span
+                      className="text-xs text-white"
+                      onClick={handleInputClick}
+                    >
+                      +
+                    </span>
+                  </div>
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </div>
+              <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+                {errors.root && <ErrorMessage message={errors.root.message} />}
+                <div className="space-y-2">
+                  <label
+                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 font-medium"
+                    htmlFor="fullName"
+                  >
+                    Full Name
+                  </label>
+
+                  <input
+                    {...register("fullName", {
+                      required: "Full Name is required.",
+                    })}
+                    className="mt-2 flex w-full border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-xl border-gray-200 focus:border-purple-300 focus:ring-purple-200 h-12"
+                    id="fullName"
+                    placeholder="Enter your full name"
+                    type="text"
+                    defaultValue={user.displayName}
+                  />
+                  {errors.fullName && (
+                    <div className="text-red-500 text-xs ml-2">
+                      {errors.fullName.message}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 font-medium"
+                    htmlFor="username"
+                  >
+                    Username
+                  </label>
+                  <input
+                    {...register("username", {
+                      required: "Username is required.",
+                      pattern: {
+                        value: /^[a-z]+$/,
+                        message: "Only lowercase characters are allowed.",
+                      },
+                    })}
+                    className="mt-2 flex w-full border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-xl border-gray-200 focus:border-purple-300 focus:ring-purple-200 h-12"
+                    id="username"
+                    placeholder="Choose a username"
+                    type="text"
+                    defaultValue={user.username}
+                  />
+                  {errors.username && (
+                    <div className="text-red-500 text-xs ml-2">
+                      {errors.username.message}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <label
+                      className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 font-medium"
+                      htmlFor="desc"
+                    >
+                      Description
+                    </label>
+                    <span className="text-xs text-gray-400">
+                      {watch("desc")?.length || 0}/200
+                    </span>
+                  </div>
+
+                  <textarea
+                    {...register("desc", {
+                      maxLength: {
+                        value: 200,
+                        message: "Description must be 200 characters or less.",
+                      },
+                    })}
+                    className="mt-2 flex w-full border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-xl border-gray-200 focus:border-purple-300 focus:ring-purple-200 resize-none"
+                    id="desc"
+                    placeholder="Write something to show the world"
+                    rows={4}
+                    defaultValue={user.description}
+                  />
+                  {errors.desc && (
+                    <div className="text-red-500 text-xs ml-2">
+                      {errors.desc.message}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    extraStyle={
+                      "bg-gray-100 flex-1 text-black rounded-xl h-12 text-lg"
+                    }
+                    title="Cancel"
+                  />
+                  <Button
+                    isDisabled={isSubmitting || updateLoading}
+                    extraStyle={
+                      "flex-1 bg-primary hover:bg-primary/90 px-4 py-2 w-full bg-gradient-to-r from-rose-400 to-purple-400 hover:from-rose-500 hover:to-purple-500 text-white rounded-xl h-12 text-lg"
+                    }
+                    title={
+                      isSubmitting || updateLoading
+                        ? "Saving..."
+                        : "Save Changes"
+                    }
+                  />
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+    </>
+  );
+};
+
+export default ProfileEditForm;
