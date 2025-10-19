@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import mockUsers from "../data/MockUsers";
+import mockUsers from "../data/mockUsers.js";
 import ProfileContext from "./ProfileContext";
 
 const ProfileContextProvider = ({ children }) => {
