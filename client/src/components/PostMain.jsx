@@ -176,7 +176,7 @@ const PostMain = () => {
                     extraStyle={
                       "disabled:opacity-50 h-10 px-4 py-2 bg-gradient-to-r from-rose-400 to-purple-400 rounded-lg text-white text-sm cursor-pointer hover:from-rose-500 hover:to-purple-500"
                     }
-                    title={createAComment ? "Creating..." : "Comment"}
+                    title={createCommentLoading ? "Creating..." : "Comment"}
                     isDisabled={!comment.trim() || createCommentLoading}
                     onClick={handleAddComment}
                   />
