@@ -32,6 +32,7 @@ const userSlice = createSlice({
       followers: true,
       following: true,
       update: false,
+      toggleFollow: false,
     },
     error: {
       profile: null,
@@ -68,7 +69,7 @@ const userSlice = createSlice({
     reset: (state) => {
       state.loading = Object.fromEntries(
         Object.keys(state.loading).map((k) => {
-          if (k === "update") return [k, false];
+          if (k === "update" || k === "toggleFollow") return [k, false];
           return [k, true];
         })
       );
@@ -155,9 +156,15 @@ const userSlice = createSlice({
 
         state.user.followingCount += 1;
         state.user.following.unshift(action.payload);
+
+        state.loading.toggleFollow = false;
       })
       .addCase(followUser.rejected, (state, action) => {
         state.error.followers = action.payload.message;
+        state.loading.toggleFollow = false;
+      })
+      .addCase(followUser.pending, (state) => {
+        state.loading.toggleFollow = true;
       })
 
       .addCase(unfollowUser.fulfilled, (state, action) => {
@@ -186,9 +193,15 @@ const userSlice = createSlice({
         state.user.following = state.user.following.filter(
           (user) => user.username !== action.payload
         );
+
+        state.loading.toggleFollow = false;
       })
       .addCase(unfollowUser.rejected, (state, action) => {
         state.error.following = action.payload.message;
+        state.loading.toggleFollow = false;
+      })
+      .addCase(unfollowUser.pending, (state) => {
+        state.loading.toggleFollow = true;
       })
 
       .addCase(update.fulfilled, (state, action) => {

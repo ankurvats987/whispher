@@ -10,7 +10,6 @@ import {
   unlikeAComment,
   unlikeAPost,
 } from "./postThunks";
-import { act } from "react";
 
 // Each post in allPosts:
 /*
@@ -213,6 +212,9 @@ const postSlice = createSlice({
       .addCase(createAComment.pending, (state) => {
         state.createCommentLoading = true;
       })
+      .addCase(createAComment.rejected, (state) => {
+        state.createCommentLoading = false;
+      })
       .addCase(createAPost.fulfilled, (state, action) => {
         const post = action.payload;
 
@@ -224,9 +226,9 @@ const postSlice = createSlice({
         state.createPostLoading = true;
       });
     builder
-      .addCase(createAPost.rejected, () => {})
-
-      .addCase(createAComment.rejected, () => {})
+      .addCase(createAPost.rejected, (state) => {
+        state.createPostLoading = false;
+      })
       .addCase(likeAPost.rejected, () => {});
   },
 });
