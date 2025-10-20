@@ -1,0 +1,14 @@
+name: Keep Render Alive
+on:
+  schedule:
+    - cron: "* * * * *"
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render App
+        run: |
+          echo "Pinging render server..."
+          curl -sSf --max-time 30 https://whispher-microblog.onrender.com/
+          echo "Server is alive!"
