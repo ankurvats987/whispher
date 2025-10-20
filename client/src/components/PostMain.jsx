@@ -19,6 +19,10 @@ const PostMain = () => {
   const error = useSelector((state) => state.post.error);
   const currentUser = useSelector((state) => state.user.user);
 
+  const createCommentLoading = useSelector(
+    (state) => state.post.createCommentLoading
+  );
+
   const [comment, setComment] = useState("");
   const location = useLocation();
   const { getAProfile } = useContext(ProfileContext);
@@ -172,8 +176,8 @@ const PostMain = () => {
                     extraStyle={
                       "disabled:opacity-50 h-10 px-4 py-2 bg-gradient-to-r from-rose-400 to-purple-400 rounded-lg text-white text-sm cursor-pointer hover:from-rose-500 hover:to-purple-500"
                     }
-                    title="Comment"
-                    isDisabled={!comment.trim()}
+                    title={createAComment ? "Creating..." : "Comment"}
+                    isDisabled={!comment.trim() || createCommentLoading}
                     onClick={handleAddComment}
                   />
                 </div>

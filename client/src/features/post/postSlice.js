@@ -125,11 +125,16 @@ const postSlice = createSlice({
     currentPost: null,
     loading: true,
     error: null,
+    createCommentLoading: false,
+    createPostLoading: false,
   },
   reducers: {
     cleanUp: (state, action) => {
       state.error = null;
       state.loading = true;
+
+      state.createCommentLoading = false;
+      state.createPostLoading = false;
 
       if (action.payload?.clearCurrentPost) {
         state.currentPost = null;
@@ -202,11 +207,21 @@ const postSlice = createSlice({
         if (state.currentPost) {
           state.currentPost.comments.unshift(comment);
         }
+
+        state.createCommentLoading = false;
+      })
+      .addCase(createAComment.pending, (state) => {
+        state.createCommentLoading = true;
       })
       .addCase(createAPost.fulfilled, (state, action) => {
         const post = action.payload;
 
         state.posts.unshift(post);
+
+        state.createPostLoading = false;
+      })
+      .addCase(createAPost.pending, (state) => {
+        state.createPostLoading = true;
       });
     builder
       .addCase(createAPost.rejected, () => {})
