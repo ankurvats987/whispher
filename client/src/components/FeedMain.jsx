@@ -95,6 +95,12 @@ const FeedMain = ({ showExplore = false }) => {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
+      {allPosts.length === 0 && (
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
+          <h1 className="text-2xl font-bold text-gray-900">No posts here</h1>
+          <h3 className="text-md">Follow other people to see their posts.</h3>
+        </div>
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-3 space-y-6">
           {showExplore && (
@@ -221,14 +227,16 @@ const FeedMain = ({ showExplore = false }) => {
             />
           ))}
         </div>
-        <div className="space-y-6 lg:col-span-2">
-          <div className="text-card-foreground bg-white shadow-sm rounded-xl border border-gray-200">
-            <div className="p-6">
-              <h3 className="text-gray-900 font-semibold mb-4">
-                Suggested for you
-              </h3>
-              <div className="space-y-4">
-                {/* {getAllProfiles()
+
+        {showExplore && (
+          <div className="space-y-6 lg:col-span-2">
+            <div className="text-card-foreground bg-white shadow-sm rounded-xl border border-gray-200">
+              <div className="p-6">
+                <h3 className="text-gray-900 font-semibold mb-4">
+                  Suggested for you
+                </h3>
+                <div className="space-y-4">
+                  {/* {getAllProfiles()
                   .filter(
                     (profile) =>
                       !amIFollowing(currentUser, profile.userId) &&
@@ -240,10 +248,11 @@ const FeedMain = ({ showExplore = false }) => {
                     console.log(profile);
                     return <ProfileCard key={profile.userId} user={profile} />;
                   })} */}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
