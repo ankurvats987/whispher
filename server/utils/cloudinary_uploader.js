@@ -22,10 +22,17 @@ export const uploadOnCloudinary = async (localFilePath) => {
       secure: true,
     });
 
-    fs.unlinkSync(localFilePath);
+    fs.unlink(localFilePath, (err) => {
+      if (err) console.error("Error deleting temp file:", err);
+    });
+
+    // fs.unlinkSync(localFilePath);
     return response;
   } catch (error) {
-    fs.unlinkSync(localFilePath);
+    if (fs.existsSync(localFilePath)) {
+      fs.unlink(localFilePath, () => {});
+    }
+    // fs.unlinkSync(localFilePath);
     console.error("Error uploading file on cloudinary.", error?.message);
     return null;
   }
