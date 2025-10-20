@@ -922,8 +922,7 @@ const sendMail = async (token, email) => {
               </p>
             </div>
             <div class="footer">
-              <p class="footer-text">© ${new Date().getFullYear()} Microblog. All rights reserved.</p>
-              <p class="footer-text" style="margin-top: 8px;">Made with 💜 for our community</p>
+              <p class="footer-text">© ${new Date().getFullYear()} Whisper. All rights reserved.</p>
             </div>
           </div>
         </body>
