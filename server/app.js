@@ -43,7 +43,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
-  req.status(200).json({
+  res.status(200).json({
     status: "ok",
     message: "You pinged the server!",
     timestamp: new Date().toISOString(),
