@@ -42,6 +42,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.get("/", (req, res) => {
+  req.status(200).json({
+    status: "ok",
+    message: "You pinged the server!",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/post", authenticate, postRouter);
 // app.get("/followed-posts", getFollowedPosts);
