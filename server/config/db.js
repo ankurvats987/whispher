@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import { Follows } from "../models/follows.model.js";
 
 dotenv.config({ path: "./.env" });
 
@@ -10,7 +9,7 @@ const connectDB = async () => {
       `${process.env.MONGODB_URI}/${process.env.DB_NAME}`
     );
 
-    await Follows.syncIndexes();
+    // await Follows.syncIndexes();
     console.log(
       "Successfully connected to MongoDB through host:",
       connectionInstance.connection.host
