@@ -21,6 +21,10 @@ const FeedMain = ({ showExplore = false }) => {
   const error = useSelector((state) => state.post.error);
   const currentUser = useSelector((state) => state.user.user);
 
+  const createPostLoading = useSelector(
+    (state) => state.post.createPostLoading
+  );
+
   const { getAProfile, amIFollowing, getAllProfiles } =
     useContext(ProfileContext);
   const navigate = useNavigate();
@@ -174,6 +178,7 @@ const FeedMain = ({ showExplore = false }) => {
                               "h-10 px-4 py-2 hover:bg-red-100 rounded-lg hover:text-red-600"
                             }
                             onClick={() => setEditable((prev) => !prev)}
+                            isDisabled={createPostLoading}
                           >
                             Cancel
                           </Button>
@@ -182,9 +187,9 @@ const FeedMain = ({ showExplore = false }) => {
                               "h-10 px-4 py-2 bg-gradient-to-r from-rose-400 to-purple-400 hover:from-rose-500 hover:to-purple-500 rounded-lg text-white"
                             }
                             onClick={handleCreatePost}
-                            isDisabled={!post.trim()}
+                            isDisabled={!post.trim() || createPostLoading}
                           >
-                            Post
+                            {createPostLoading ? "Posting..." : "Post"}
                           </Button>
                         </div>
                       </div>
