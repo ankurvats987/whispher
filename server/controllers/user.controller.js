@@ -550,14 +550,23 @@ const resetPassword = async (req, res) => {
 
 const sendMail = async (token, email) => {
   try {
+    // const transporter = nodemailer.createTransport({
+    //   service: "gmail",
+    //   auth: {
+    //     user: process.env.EMAIL_USER,
+    //     pass: process.env.EMAIL_PASS,
+    //   },
+    //   port: 465,
+    //   secure: true,
+    // });
+
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: process.env.BREVO_HOST,
+      port: process.env.BREVO_PORT,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS,
       },
-      port: 465,
-      secure: true,
     });
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
