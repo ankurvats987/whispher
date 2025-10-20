@@ -95,7 +95,7 @@ const FeedMain = ({ showExplore = false }) => {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
-      {allPosts.length === 0 && (
+      {allPosts.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
           <h1 className="text-3xl font-bold text bg-gradient-to-r from-rose-500 to-purple-500 bg-clip-text text-transparent">
             No posts here
@@ -104,135 +104,136 @@ const FeedMain = ({ showExplore = false }) => {
             Follow other people to see their posts.
           </h3>
         </div>
-      )}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        <div className="lg:col-span-3 space-y-6">
-          {showExplore && (
-            <div className="text-card-foreground bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-              <div className="p-6">
-                {editable ? (
-                  <div className="space-y-4">
-                    <div className="flex space-x-4">
-                      <img
-                        src={currentUser.profilePicture}
-                        alt="Your Profile Picture"
-                        className="h-12 w-12 rounded-full object-cover"
-                      />
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="lg:col-span-3 space-y-6">
+            {showExplore && (
+              <div className="text-card-foreground bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <div className="p-6">
+                  {editable ? (
+                    <div className="space-y-4">
+                      <div className="flex space-x-4">
+                        <img
+                          src={currentUser.profilePicture}
+                          alt="Your Profile Picture"
+                          className="h-12 w-12 rounded-full object-cover"
+                        />
 
-                      <div className="flex flex-col flex-1">
-                        <textarea
-                          value={post}
-                          onChange={(e) => setPost(e.target.value)}
-                          name="write-post"
-                          id="write-post"
-                          placeholder="Share your thoughts"
-                          className="flex min-h-[80px] w-full border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 border-gray-300 focus:border-gray-500 resize-none rounded-lg"
-                          maxLength={300}
-                        ></textarea>
-                        <div className="text-gray-500 text-right mt-2">
-                          <span>{post.length}</span>
-                          <span>/300</span>
+                        <div className="flex flex-col flex-1">
+                          <textarea
+                            value={post}
+                            onChange={(e) => setPost(e.target.value)}
+                            name="write-post"
+                            id="write-post"
+                            placeholder="Share your thoughts"
+                            className="flex min-h-[80px] w-full border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 border-gray-300 focus:border-gray-500 resize-none rounded-lg"
+                            maxLength={300}
+                          ></textarea>
+                          <div className="text-gray-500 text-right mt-2">
+                            <span>{post.length}</span>
+                            <span>/300</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <Button
+                          extraStyle={
+                            "hover:text-accent-foreground h-9 px-3 text-gray-500 hover:bg-gray-100 rounded-lg text-sm hover:text-gray-700"
+                          }
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-image w-4 h-4 mr-2"
+                          >
+                            <rect
+                              width="18"
+                              height="18"
+                              x="3"
+                              y="3"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                            <circle cx="9" cy="9" r="2"></circle>
+                            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+                          </svg>
+                          Add Image
+                        </Button>
+
+                        <div className="space-x-4">
+                          <Button
+                            extraStyle={
+                              "h-10 px-4 py-2 hover:bg-red-100 rounded-lg hover:text-red-600"
+                            }
+                            onClick={() => setEditable((prev) => !prev)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            extraStyle={
+                              "h-10 px-4 py-2 bg-gradient-to-r from-rose-400 to-purple-400 hover:from-rose-500 hover:to-purple-500 rounded-lg text-white"
+                            }
+                            onClick={handleCreatePost}
+                            isDisabled={!post.trim()}
+                          >
+                            Post
+                          </Button>
                         </div>
                       </div>
                     </div>
-
-                    <div className="flex justify-between items-center">
-                      <Button
-                        extraStyle={
-                          "hover:text-accent-foreground h-9 px-3 text-gray-500 hover:bg-gray-100 rounded-lg text-sm hover:text-gray-700"
-                        }
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          class="lucide lucide-image w-4 h-4 mr-2"
-                        >
-                          <rect
-                            width="18"
-                            height="18"
-                            x="3"
-                            y="3"
-                            rx="2"
-                            ry="2"
-                          ></rect>
-                          <circle cx="9" cy="9" r="2"></circle>
-                          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
-                        </svg>
-                        Add Image
-                      </Button>
-
-                      <div className="space-x-4">
-                        <Button
-                          extraStyle={
-                            "h-10 px-4 py-2 hover:bg-red-100 rounded-lg hover:text-red-600"
-                          }
-                          onClick={() => setEditable((prev) => !prev)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          extraStyle={
-                            "h-10 px-4 py-2 bg-gradient-to-r from-rose-400 to-purple-400 hover:from-rose-500 hover:to-purple-500 rounded-lg text-white"
-                          }
-                          onClick={handleCreatePost}
-                          isDisabled={!post.trim()}
-                        >
-                          Post
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <Button
-                    extraStyle={
-                      "hover:text-accent-foreground px-4 py-2 w-full justify-start text-left text-gray-500 hover:bg-gray-50 rounded-lg h-12 cursor-text"
-                    }
-                    onClick={() => setEditable((prev) => !prev)}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="lucide lucide-plus w-5 h-5 mr-3"
+                  ) : (
+                    <Button
+                      extraStyle={
+                        "hover:text-accent-foreground px-4 py-2 w-full justify-start text-left text-gray-500 hover:bg-gray-50 rounded-lg h-12 cursor-text"
+                      }
+                      onClick={() => setEditable((prev) => !prev)}
                     >
-                      <path d="M5 12h14"></path>
-                      <path d="M12 5v14"></path>
-                    </svg>
-                    What's on your mind?
-                  </Button>
-                )}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-plus w-5 h-5 mr-3"
+                      >
+                        <path d="M5 12h14"></path>
+                        <path d="M12 5v14"></path>
+                      </svg>
+                      What's on your mind?
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {allPosts.map((post) => (
-            <ContentCard
-              key={post._id}
-              content={post}
-              cardClickHandler={() =>
-                navigate(`/post/${post._id}`, {
-                  state: { postId: post._id },
-                })
-              }
-              profileClickHandler={(e) => handleProfileClick(e, post.createdBy)}
-            />
-          ))}
-        </div>
+            {allPosts.map((post) => (
+              <ContentCard
+                key={post._id}
+                content={post}
+                cardClickHandler={() =>
+                  navigate(`/post/${post._id}`, {
+                    state: { postId: post._id },
+                  })
+                }
+                profileClickHandler={(e) =>
+                  handleProfileClick(e, post.createdBy)
+                }
+              />
+            ))}
+          </div>
 
-        {showExplore && (
           <div className="space-y-6 lg:col-span-2">
             <div className="text-card-foreground bg-white shadow-sm rounded-xl border border-gray-200">
               <div className="p-6">
@@ -256,8 +257,8 @@ const FeedMain = ({ showExplore = false }) => {
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
