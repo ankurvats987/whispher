@@ -548,48 +548,251 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// const sendMail = async (token, email) => {
+//   try {
+//     // const transporter = nodemailer.createTransport({
+//     //   service: "gmail",
+//     //   auth: {
+//     //     user: process.env.EMAIL_USER,
+//     //     pass: process.env.EMAIL_PASS,
+//     //   },
+//     //   port: 465,
+//     //   secure: true,
+//     // });
+
+//     const smtpPort = parseInt(process.env.BREVO_PORT) || 587;
+
+//     const transporter = nodemailer.createTransport({
+//       host: process.env.BREVO_HOST,
+//       port: process.env.BREVO_PORT,
+//       secure: smtpPort === 465,
+//       auth: {
+//         user: process.env.BREVO_USER,
+//         pass: process.env.BREVO_PASS,
+//       },
+//       tls: {
+//         rejectUnauthorized: false,
+//       },
+//       logger: true,
+//       debug: true,
+//     });
+
+//     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+//     console.log("Sending email to:", email);
+//     console.log("From:", process.env.EMAIL_USER);
+//     console.log("Frontend URL:", process.env.FRONTEND_URL);
+//     console.log("Reset link:", resetLink);
+
+//     const mailOptions = {
+//       from: `"Microblogging App" <${process.env.EMAIL_USER}>`,
+//       to: email,
+//       subject: "Reset Your Password",
+//       html: `
+//       <!DOCTYPE html>
+//       <html>
+//         <head>
+//           <meta charset="UTF-8">
+//           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//           <style>
+//             body {
+//               margin: 0;
+//               padding: 0;
+//               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+//               background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 50%, #e0f2fe 100%);
+//             }
+//             .container {
+//               max-width: 600px;
+//               margin: 40px auto;
+//               background: white;
+//               border-radius: 16px;
+//               overflow: hidden;
+//               box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+//             }
+//             .header {
+//               background: linear-gradient(135deg, #fb7185 0%, #a855f7 100%);
+//               padding: 40px 30px;
+//               text-align: center;
+//             }
+//             .logo {
+//               font-size: 32px;
+//               font-weight: bold;
+//               color: white;
+//               margin: 0;
+//               text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+//             }
+//             .content {
+//               padding: 40px 30px;
+//             }
+//             .title {
+//               font-size: 24px;
+//               font-weight: bold;
+//               color: #1f2937;
+//               margin: 0 0 16px 0;
+//             }
+//             .text {
+//               color: #6b7280;
+//               line-height: 1.6;
+//               margin: 0 0 24px 0;
+//               font-size: 16px;
+//             }
+//             .button {
+//               display: inline-block;
+//               background: linear-gradient(135deg, #fb7185 0%, #a855f7 100%);
+//               color: white;
+//               text-decoration: none;
+//               padding: 14px 32px;
+//               border-radius: 12px;
+//               font-weight: 600;
+//               font-size: 16px;
+//               box-shadow: 0 4px 12px rgba(251, 113, 133, 0.3);
+//               transition: transform 0.2s;
+//             }
+//             .button:hover {
+//               transform: translateY(-2px);
+//               box-shadow: 0 6px 16px rgba(251, 113, 133, 0.4);
+//             }
+//             .button-container {
+//               text-align: center;
+//               margin: 32px 0;
+//             }
+//             .divider {
+//               border: none;
+//               border-top: 1px solid #e5e7eb;
+//               margin: 32px 0;
+//             }
+//             .small-text {
+//               color: #9ca3af;
+//               font-size: 14px;
+//               line-height: 1.5;
+//             }
+//             .footer {
+//               background: #f9fafb;
+//               padding: 24px 30px;
+//               text-align: center;
+//               border-top: 1px solid #e5e7eb;
+//             }
+//             .footer-text {
+//               color: #6b7280;
+//               font-size: 14px;
+//               margin: 0;
+//             }
+//             .highlight {
+//               background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 100%);
+//               padding: 16px;
+//               border-radius: 8px;
+//               border-left: 4px solid #a855f7;
+//               margin: 24px 0;
+//             }
+//           </style>
+//         </head>
+//         <body>
+//           <div class="container">
+//             <!-- Header -->
+//             <div class="header">
+//               <h1 class="logo">✨ Whisper</h1>
+//             </div>
+
+//             <!-- Content -->
+//             <div class="content">
+//               <h2 class="title">Reset Your Password</h2>
+//               <p class="text">
+//                 Hi there!
+//               </p>
+//               <p class="text">
+//                 We received a request to reset your password. Click the button below to create a new password:
+//               </p>
+
+//               <div class="button-container">
+//                 <a href="${resetLink}" class="button">Reset Password</a>
+//               </div>
+
+//               <div class="highlight">
+//                 <p class="small-text" style="margin: 0; color: #6b7280;">
+//                   ⏰ <strong>This link expires in 15 minutes</strong> for your security.
+//                 </p>
+//               </div>
+
+//               <hr class="divider">
+
+//               <p class="small-text">
+//                 If the button doesn't work, copy and paste this link into your browser:
+//               </p>
+//               <p class="small-text" style="word-break: break-all; color: #a855f7;">
+//                 ${resetLink}
+//               </p>
+
+//               <hr class="divider">
+
+//               <p class="small-text">
+//                 <strong>Didn't request this?</strong> You can safely ignore this email. Your password will remain unchanged.
+//               </p>
+//             </div>
+
+//             <!-- Footer -->
+//             <div class="footer">
+//               <p class="footer-text">
+//                 © ${new Date().getFullYear()} Microblog. All rights reserved.
+//               </p>
+//               <p class="footer-text" style="margin-top: 8px;">
+//                 Made with 💜 for our community
+//               </p>
+//             </div>
+//           </div>
+//         </body>
+//       </html>
+//     `,
+//       text: `
+// Reset Your Password
+
+// Hi there!
+
+// We received a request to reset your password. Click the link below to create a new password:
+
+// ${resetLink}
+
+// This link expires in 15 minutes for your security.
+
+// Didn't request this? You can safely ignore this email. Your password will remain unchanged.
+
+// © ${new Date().getFullYear()} Whisper. All rights reserved.
+//     `,
+//     };
+
+//     const info = await transporter.sendMail(
+//       mailOptions
+//       // function (error, info) {
+//       //   if (error) {
+//       //     console.log("Error:", error);
+//       //   } else {
+//       //     console.log("Email sent successfully!");
+//       //     console.log("Message ID:", info.messageId);
+//       //   }
+//       // }
+//     );
+//     console.log("Email sent successfully!");
+//     console.log("Message ID:", info?.messageId || "No message ID");
+//     console.log("Response:", info.response);
+//     console.log("Accepted:", info.accepted);
+//     console.log("Rejected:", info.rejected);
+//     return true;
+//   } catch (error) {
+//     console.error("Error sending email:", error);
+//     throw new Error(`Failed to send email: ${error.message}`);
+//   }
+// };
+
 const sendMail = async (token, email) => {
   try {
-    // const transporter = nodemailer.createTransport({
-    //   service: "gmail",
-    //   auth: {
-    //     user: process.env.EMAIL_USER,
-    //     pass: process.env.EMAIL_PASS,
-    //   },
-    //   port: 465,
-    //   secure: true,
-    // });
-
-    const smtpPort = parseInt(process.env.BREVO_PORT) || 587;
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.BREVO_HOST,
-      port: process.env.BREVO_PORT,
-      secure: smtpPort === 465,
-      auth: {
-        user: process.env.BREVO_USER,
-        pass: process.env.BREVO_PASS,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-
-    console.log("Verifying SMTP connection...");
-    await transporter.verify();
-    console.log("SMTP Connection verified successfully!");
-
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-    console.log("Sending email to:", email);
-    console.log("From:", process.env.EMAIL_USER);
-    console.log("Frontend URL:", process.env.FRONTEND_URL);
-    console.log("Reset link:", resetLink);
 
-    const mailOptions = {
-      from: `"Microblogging App" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Reset Your Password",
-      html: `
+    console.log("=== Sending Email via Brevo API ===");
+    console.log("To:", email);
+    console.log("From:", process.env.EMAIL_USER);
+    console.log("API Key exists:", !!process.env.BREVO_API_KEY);
+    console.log("Reset link:", resetLink);
+    console.log("===================================");
+
+    const htmlContent = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -689,96 +892,85 @@ const sendMail = async (token, email) => {
         </head>
         <body>
           <div class="container">
-            <!-- Header -->
             <div class="header">
               <h1 class="logo">✨ Whisper</h1>
             </div>
-            
-            <!-- Content -->
             <div class="content">
               <h2 class="title">Reset Your Password</h2>
-              <p class="text">
-                Hi there!
-              </p>
+              <p class="text">Hi there!</p>
               <p class="text">
                 We received a request to reset your password. Click the button below to create a new password:
               </p>
-              
               <div class="button-container">
                 <a href="${resetLink}" class="button">Reset Password</a>
               </div>
-              
               <div class="highlight">
                 <p class="small-text" style="margin: 0; color: #6b7280;">
                   ⏰ <strong>This link expires in 15 minutes</strong> for your security.
                 </p>
               </div>
-              
               <hr class="divider">
-              
               <p class="small-text">
                 If the button doesn't work, copy and paste this link into your browser:
               </p>
               <p class="small-text" style="word-break: break-all; color: #a855f7;">
                 ${resetLink}
               </p>
-              
               <hr class="divider">
-              
               <p class="small-text">
                 <strong>Didn't request this?</strong> You can safely ignore this email. Your password will remain unchanged.
               </p>
             </div>
-            
-            <!-- Footer -->
             <div class="footer">
-              <p class="footer-text">
-                © ${new Date().getFullYear()} Microblog. All rights reserved.
-              </p>
-              <p class="footer-text" style="margin-top: 8px;">
-                Made with 💜 for our community
-              </p>
+              <p class="footer-text">© ${new Date().getFullYear()} Microblog. All rights reserved.</p>
+              <p class="footer-text" style="margin-top: 8px;">Made with 💜 for our community</p>
             </div>
           </div>
         </body>
       </html>
-    `,
-      text: `
-Reset Your Password
+    `;
 
-Hi there!
+    const textContent = `Reset Your Password\n\nHi there!\n\nWe received a request to reset your password. Click the link below to create a new password:\n\n${resetLink}\n\nThis link expires in 15 minutes for your security.\n\nDidn't request this? You can safely ignore this email. Your password will remain unchanged.\n\n© ${new Date().getFullYear()} Whisper. All rights reserved.`;
 
-We received a request to reset your password. Click the link below to create a new password:
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: {
+          name: "Whisper",
+          email: process.env.EMAIL_USER,
+        },
+        to: [
+          {
+            email: email,
+            name: email.split("@")[0],
+          },
+        ],
+        subject: "Reset Your Password",
+        htmlContent: htmlContent,
+        textContent: textContent,
+      }),
+    });
 
-${resetLink}
+    const data = await response.json();
 
-This link expires in 15 minutes for your security.
+    if (!response.ok) {
+      console.error("Brevo API Error:", data);
+      throw new Error(
+        `Brevo API error: ${data.message || response.statusText}`
+      );
+    }
 
-Didn't request this? You can safely ignore this email. Your password will remain unchanged.
+    console.log("Email sent successfully via Brevo API!");
+    console.log("Message ID:", data.messageId);
 
-© ${new Date().getFullYear()} Whisper. All rights reserved.
-    `,
-    };
-
-    const info = await transporter.sendMail(
-      mailOptions
-      // function (error, info) {
-      //   if (error) {
-      //     console.log("Error:", error);
-      //   } else {
-      //     console.log("Email sent successfully!");
-      //     console.log("Message ID:", info.messageId);
-      //   }
-      // }
-    );
-    console.log("Email sent successfully!");
-    console.log("Message ID:", info?.messageId || "No message ID");
-    console.log("Response:", info.response);
-    console.log("Accepted:", info.accepted);
-    console.log("Rejected:", info.rejected);
     return true;
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Error sending email:", error.message);
     throw new Error(`Failed to send email: ${error.message}`);
   }
 };
