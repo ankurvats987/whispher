@@ -3,7 +3,7 @@ import React from "react";
 export const Logo = () => {
   return (
     <div className="flex items-center space-x-2 text-xl font-semibold">
-      <div
+      {/* <div
         className="w-8 h-8 rounded-lg
       bg-gradient-to-r from-rose-400 to-purple-400 flex items-center justify-center"
       >
@@ -25,7 +25,9 @@ export const Logo = () => {
           <path d="M4 17v2"></path>
           <path d="M5 18H3"></path>
         </svg>
-      </div>
+      </div> */}
+
+      <img src="/file.svg" alt="Logo" className="w-7 h-7" />
 
       <span className="text-xl font-semibold text-gray-800">Whisper</span>
     </div>
