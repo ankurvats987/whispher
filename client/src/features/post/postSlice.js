@@ -7,6 +7,7 @@ import {
   getUserPosts,
   likeAComment,
   likeAPost,
+  searchPost,
   unlikeAComment,
   unlikeAPost,
 } from "./postThunks";
@@ -121,16 +122,22 @@ const postSlice = createSlice({
   name: "post",
   initialState: {
     posts: [],
+    searchedPosts: [],
     currentPost: null,
     loading: true,
     error: null,
+    searchPostError: null,
+    searchPostLoading: true,
     createCommentLoading: false,
     createPostLoading: false,
   },
   reducers: {
     cleanUp: (state, action) => {
+      state.searchPostError = null;
       state.error = null;
       state.loading = true;
+
+      state.searchPostLoading = true;
 
       state.createCommentLoading = false;
       state.createPostLoading = false;
@@ -224,12 +231,25 @@ const postSlice = createSlice({
       })
       .addCase(createAPost.pending, (state) => {
         state.createPostLoading = true;
-      });
-    builder
+      })
       .addCase(createAPost.rejected, (state) => {
         state.createPostLoading = false;
       })
-      .addCase(likeAPost.rejected, () => {});
+      .addCase(likeAPost.rejected, () => {})
+      .addCase(searchPost.fulfilled, (state, action) => {
+        state.searchedPosts = action.payload.posts;
+
+        state.searchPostLoading = false;
+        state.searchPostError = null;
+      })
+      .addCase(searchPost.rejected, (state, action) => {
+        state.searchPostLoading = false;
+        state.searchPostError = action.payload;
+      })
+      .addCase(searchPost.pending, (state) => {
+        state.searchPostLoading = true;
+        state.searchPostError = null;
+      });
   },
 });
 

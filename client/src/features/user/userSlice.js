@@ -4,6 +4,7 @@ import {
   getUserData,
   getUserFollowers,
   getUserFollowing,
+  searchUser,
   unfollowUser,
   update,
 } from "./userThunks";
@@ -33,13 +34,16 @@ const userSlice = createSlice({
       following: true,
       update: false,
       toggleFollow: false,
+      searching: true,
     },
     error: {
       profile: null,
       followers: null,
       following: null,
       update: null,
+      searching: null,
     },
+    searchedUser: [],
   },
   reducers: {
     setProfileData: (state, action) => {
@@ -60,8 +64,6 @@ const userSlice = createSlice({
         followersCount: userData.followersCount,
         followingCount: userData.followingCount,
       };
-
-      console.log(state.user);
     },
     clearUserData: (state) => {
       state.user = {};
@@ -222,6 +224,26 @@ const userSlice = createSlice({
       .addCase(update.pending, (state) => {
         state.loading.update = true;
         state.error.update = null;
+      })
+      .addCase(searchUser.fulfilled, (state, action) => {
+        state.searchedUser = action.payload.users;
+
+        state.loading.searching = false;
+        state.error.searching = null;
+
+        // console.log(current(state.searchedUser));
+      })
+      .addCase(searchUser.rejected, (state, action) => {
+        state.loading.searching = false;
+        state.error.searching = action.payload;
+
+        // console.log(current(state.searchedUser));
+      })
+      .addCase(searchUser.pending, (state, action) => {
+        state.loading.searching = true;
+        state.error.searching = null;
+
+        // console.log(current(state.searchedUser));
       });
   },
 });

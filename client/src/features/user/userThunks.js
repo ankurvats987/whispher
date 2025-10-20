@@ -4,6 +4,7 @@ import {
   getFollowers,
   getFollowing,
   getUser,
+  search,
   unfollow,
   updateProfile,
 } from "../../service/userService";
@@ -133,6 +134,24 @@ export const update = createAsyncThunk(
         "Something went wrong while updating the profile";
 
       console.error("Error in updating profile", errMsg);
+      return thunkAPI.rejectWithValue(errMsg);
+    }
+  }
+);
+
+export const searchUser = createAsyncThunk(
+  "/user/search",
+  async (key, thunkAPI) => {
+    try {
+      const response = await search(key);
+
+      return response.data.data;
+    } catch (error) {
+      const errMsg =
+        error?.response?.data?.message ||
+        "Something went wrong while searching";
+
+      console.error("Error in search user", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
     }
   }

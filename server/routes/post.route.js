@@ -12,11 +12,14 @@ import {
   unlikeComment,
   getAllPost,
   getFollowedPosts,
+  searchPost,
 } from "../controllers/post.controller.js";
 
 postRouter.post("/create", createPost);
 postRouter.get("/all", getAllPost);
 postRouter.get("/:id", getPost);
+postRouter.get("/search/:key", searchPost);
+
 postRouter.get("/user/:username", getFollowedPosts);
 postRouter.post("/:id/like", likePost);
 postRouter.post("/:id/unlike", unlikePost);

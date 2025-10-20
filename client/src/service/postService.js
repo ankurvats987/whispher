@@ -35,3 +35,7 @@ export const likePost = async (postId, likedBy) => {
 export const unlikePost = async (postId, likedBy) => {
   return await api.post(`/post/${postId}/unlike`, { likedBy });
 };
+
+export const search = async (key) => {
+  return await api.get(`/post/search/${key}`);
+};

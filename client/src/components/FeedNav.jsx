@@ -1,14 +1,22 @@
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { logoutUser } from "../features/auth/authThunks";
 import { Button } from "./Button";
 import { Logo } from "./Logo";
+import { useState } from "react";
 
 const FeedNav = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [query, setQuery] = useState("");
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") navigate(`/search/${query}`);
   };
 
   const myProfile = useSelector((state) => state.user.user);
@@ -145,8 +153,11 @@ const FeedNav = () => {
             </svg>
             <input
               type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Search..."
               className="pl-10 pr-4 py-2 w-64 bg-gray-100 rounded-lg border-0 focus:ring-2 focus:bg-white"
+              onKeyDown={handleKeyDown}
             />
           </div>
           <Button

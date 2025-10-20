@@ -7,6 +7,7 @@ import {
   getPosts,
   likeComment,
   likePost,
+  search,
   unlikeComment,
   unlikePost,
 } from "../../service/postService";
@@ -14,8 +15,6 @@ import {
 export const getAllPosts = createAsyncThunk("post/all", async (_, thunkAPI) => {
   try {
     const response = await getPosts();
-
-    console.log(response);
 
     return response.data.data;
   } catch (error) {
@@ -195,6 +194,24 @@ export const unlikeAPost = createAsyncThunk(
         "Something went wrong while unliking the post";
 
       console.error("Error in unliking the post", errMsg);
+      return thunkAPI.rejectWithValue(errMsg);
+    }
+  }
+);
+
+export const searchPost = createAsyncThunk(
+  "post/search/key",
+  async (key, thunkAPI) => {
+    try {
+      const response = await search(key);
+
+      return response.data.data;
+    } catch (error) {
+      const errMsg =
+        error?.response?.data?.message ||
+        "Something went wrong while searching the posts";
+
+      console.error("Error in searching the posts", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
     }
   }

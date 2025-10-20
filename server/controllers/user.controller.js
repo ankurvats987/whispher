@@ -1035,6 +1035,35 @@ const updatePassword = async (req, res) => {
   }
 };
 
+const searchUser = async (req, res) => {
+  try {
+    const key = req.params.key || "";
+
+    const users = await User.find().select("-password -refreshToken").lean();
+
+    let searchedUsers = [];
+
+    if (key === "") {
+      searchedUsers = users;
+    } else {
+      users.forEach((user) => {
+        if (user.username.includes(key) || user.displayName.includes(key)) {
+          searchedUsers.push(user);
+        }
+      });
+    }
+
+    return APIResponse.success(
+      "Users retrieved",
+      { users: searchedUsers },
+      200
+    ).send(res);
+  } catch (error) {
+    console.error("Search user error:", error?.message);
+    return APIResponse.error("Search user error", null, 500).send(res);
+  }
+};
+
 export {
   createUser,
   loginUser,
@@ -1049,4 +1078,5 @@ export {
   resetPassword,
   verifyResetToken,
   updatePassword,
+  searchUser,
 };

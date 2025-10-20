@@ -266,6 +266,31 @@ const unlikeComment = async (req, res) => {
   }
 };
 
+const searchPost = async (req, res) => {
+  try {
+    const key = req.params.key || "";
+
+    const posts = await Post.find().sort({ createdAt: -1 }).lean();
+
+    let searchedPosts = [];
+
+    posts.forEach((post) => {
+      if (post.content.includes(key)) {
+        searchedPosts.push(post);
+      }
+    });
+
+    return APIResponse.success(
+      "Posts retrieved",
+      { posts: searchedPosts },
+      200
+    ).send(res);
+  } catch (error) {
+    console.error("Search post error:", error?.message);
+    return APIResponse.error("Search post error", null, 500).send(res);
+  }
+};
+
 export {
   createComment,
   createPost,
@@ -276,4 +301,5 @@ export {
   likePost,
   unlikeComment,
   unlikePost,
+  searchPost,
 };

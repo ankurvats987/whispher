@@ -27,3 +27,7 @@ export const updateProfile = async (username, data) => {
     },
   });
 };
+
+export const search = async (key) => {
+  return await api.get(`/user/search/${key}`);
+};

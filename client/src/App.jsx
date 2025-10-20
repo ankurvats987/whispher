@@ -21,6 +21,7 @@ import EditProfile from "./pages/EditProfile";
 import ResetPassword from "./pages/ResetPassword";
 import Explore from "./pages/Explore";
 import { NotFound } from "./pages/NotFound";
+import SearchPage from "./pages/SearchPage";
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,6 +36,7 @@ const Router = createBrowserRouter(
         <Route path="/post/:postId" element={<Post />} />
         <Route path="/profile/:username" element={<Profile />} />
         <Route path="/profile/edit" element={<EditProfile />} />
+        <Route path="/search/:key?" element={<SearchPage />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Route>

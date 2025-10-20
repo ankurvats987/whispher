@@ -9,6 +9,7 @@ import {
   logoutUser,
   refreshToken,
   resetPassword,
+  searchUser,
   unfollow,
   updatePassword,
   updateProfile,
@@ -38,5 +39,8 @@ userRouter
 userRouter.route("/reset").post(resetPassword);
 userRouter.route("/reset/verify").post(verifyResetToken);
 userRouter.route("/reset/update").post(updatePassword);
+
+userRouter.route("/search").get(searchUser);
+userRouter.route("/search/:key").get(searchUser);
 
 export default userRouter;
