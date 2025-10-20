@@ -1,7 +1,9 @@
 import React from "react";
 import { Button } from "./Button";
+import { useNavigate } from "react-router";
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <main className="px-6 py-16">
       <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
@@ -22,10 +24,12 @@ export const HeroSection = () => {
             <Button
               extraStyle=" bg-primary hover:bg-primary/90 h-11 bg-gradient-to-r from-rose-400 to-purple-400 hover:from-rose-500 hover:to-purple-500 text-white rounded-full px-8 py-3 text-lg"
               title={"Get Started Free"}
+              onClick={() => navigate("/register")}
             />
             <Button
               extraStyle="bg-white hover:text-accent-foreground h-11 border-2 border-purple-200 text-purple-600 hover:bg-purple-50 rounded-full px-8 py-3 text-lg"
               title={"Log In"}
+              onClick={() => navigate("/login")}
             />
           </div>
           <div className="flex items-center space-x-8 pt-8">

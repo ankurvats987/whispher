@@ -20,6 +20,7 @@ import { Registration } from "./pages/Registration";
 import EditProfile from "./pages/EditProfile";
 import ResetPassword from "./pages/ResetPassword";
 import Explore from "./pages/Explore";
+import { NotFound } from "./pages/NotFound";
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,6 +36,7 @@ const Router = createBrowserRouter(
         <Route path="/profile/:username" element={<Profile />} />
         <Route path="/profile/edit" element={<EditProfile />} />
       </Route>
+      <Route path="*" element={<NotFound />} />
     </Route>
   )
 );
