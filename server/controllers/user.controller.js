@@ -563,9 +563,13 @@ const sendMail = async (token, email) => {
     const transporter = nodemailer.createTransport({
       host: process.env.BREVO_HOST,
       port: process.env.BREVO_PORT,
+      secure: false,
       auth: {
         user: process.env.BREVO_USER,
         pass: process.env.BREVO_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     });
 
@@ -751,18 +755,21 @@ Didn't request this? You can safely ignore this email. Your password will remain
     };
 
     const info = await transporter.sendMail(
-      mailOptions,
-      function (error, info) {
-        if (error) {
-          console.log("Error:", error);
-        } else {
-          console.log("Email sent successfully!");
-          console.log("Message ID:", info.messageId);
-        }
-      }
+      mailOptions
+      // function (error, info) {
+      //   if (error) {
+      //     console.log("Error:", error);
+      //   } else {
+      //     console.log("Email sent successfully!");
+      //     console.log("Message ID:", info.messageId);
+      //   }
+      // }
     );
     console.log("Email sent successfully!");
     console.log("Message ID:", info?.messageId || "No message ID");
+    console.log("Response:", info.response);
+    console.log("Accepted:", info.accepted);
+    console.log("Rejected:", info.rejected);
     return true;
   } catch (error) {
     console.error("Error sending email:", error);
