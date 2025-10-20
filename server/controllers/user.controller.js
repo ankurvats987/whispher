@@ -560,10 +560,12 @@ const sendMail = async (token, email) => {
     //   secure: true,
     // });
 
+    const smtpPort = parseInt(process.env.BREVO_PORT) || 587;
+
     const transporter = nodemailer.createTransport({
       host: process.env.BREVO_HOST,
       port: process.env.BREVO_PORT,
-      secure: false,
+      secure: smtpPort === 465,
       auth: {
         user: process.env.BREVO_USER,
         pass: process.env.BREVO_PASS,
@@ -572,6 +574,10 @@ const sendMail = async (token, email) => {
         rejectUnauthorized: false,
       },
     });
+
+    console.log("Verifying SMTP connection...");
+    await transporter.verify();
+    console.log("SMTP Connection verified successfully!");
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
     console.log("Sending email to:", email);
