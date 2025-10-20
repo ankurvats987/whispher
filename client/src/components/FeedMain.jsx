@@ -97,8 +97,12 @@ const FeedMain = ({ showExplore = false }) => {
     <div className="max-w-5xl mx-auto px-6 py-8">
       {allPosts.length === 0 && (
         <div className="flex flex-col items-center justify-center h-[calc(100vh-8rem)]">
-          <h1 className="text-2xl font-bold text-gray-900">No posts here</h1>
-          <h3 className="text-md">Follow other people to see their posts.</h3>
+          <h1 className="text-3xl font-bold text bg-gradient-to-r from-rose-500 to-purple-500 bg-clip-text text-transparent">
+            No posts here
+          </h1>
+          <h3 className="text-md text-gray-500">
+            Follow other people to see their posts.
+          </h3>
         </div>
       )}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
