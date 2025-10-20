@@ -34,13 +34,13 @@ const Profile = ({ myProfile = false }) => {
 
   if (userDataLoading) {
     return (
-      <div className="flex justify-center items-center h-40">
+      <div className="flex justify-center items-center min-h-screen">
         <span className="text-gray-500 text-lg">Loading user data...</span>
       </div>
     );
   } else if (errorFetching) {
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)] ">
+      <div className="flex flex-col items-center justify-center min-h-screen">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="w-10 h-10 text-red-400 mb-2"

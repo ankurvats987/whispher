@@ -25,7 +25,11 @@ const ProtectedRoute = () => {
   }, [accessToken, dispatch, hasTriedRefresh]);
 
   if (!hasTriedRefresh || loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Authenticating...
+      </div>
+    );
   }
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
