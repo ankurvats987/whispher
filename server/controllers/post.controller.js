@@ -81,8 +81,6 @@ const getFollowedPosts = async (req, res) => {
     //   )
     // ).flat();
 
-    console.log(postsOfFollowing);
-
     return APIResponse.success(
       "Followed Users",
       { posts: postsOfFollowing },
