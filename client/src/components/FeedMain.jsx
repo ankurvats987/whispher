@@ -213,11 +213,11 @@ const FeedMain = ({ showExplore = false }) => {
                               id="write-post"
                               placeholder="Share your thoughts"
                               className="flex min-h-[80px] w-full border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 border-gray-300 focus:border-gray-500 resize-none rounded-lg"
-                              maxLength={300}
+                              maxLength={1500}
                             ></textarea>
                             <div className="text-gray-500 text-right mt-2">
                               <span>{post.length}</span>
-                              <span>/300</span>
+                              <span>/1500</span>
                             </div>
 
                             <div className="flex space-x-4 px-4">
