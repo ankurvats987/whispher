@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 import ProfileContext from "../context/ProfileContext";
-import { cleanUp } from "../features/post/postSlice";
+import { cleanUp, toggleReadMore } from "../features/post/postSlice";
 import { createAComment, getAPost } from "../features/post/postThunks";
 import { Button } from "./Button";
 import ContentCard from "./ContentCard";
@@ -32,6 +32,8 @@ const PostMain = () => {
   const navigate = useNavigate();
   const commentSectionRef = useRef(null);
 
+  const readMore = useSelector((state) => state.post.readMore);
+
   const [showReadMore, setShowReadMore] = useState(false);
   const [expand, setExpand] = useState(false);
 
@@ -52,6 +54,7 @@ const PostMain = () => {
       try {
         const data = await dispatch(getAPost(postId)).unwrap();
         setShowReadMore(data.post.content.length > 200);
+        setExpand(readMore);
       } catch (error) {
         console.error("Fetch Post Error:", error?.message);
       }
@@ -75,11 +78,10 @@ const PostMain = () => {
     e.stopPropagation();
 
     try {
-      const res = await dispatch(
+      await dispatch(
         createAComment({ postId, comment: comment.trim() })
       ).unwrap();
 
-      console.log(res);
       toast.success("Comment created successfully!");
     } catch (error) {
       toast.error(error || "Failed to create comment");

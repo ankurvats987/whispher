@@ -65,9 +65,9 @@ const InteractionTab = ({ onlyLike = false, content, postId = null }) => {
     >
       {/* Like Button */}
       <Button
-        extraStyle={
-          "text-gray-500 rounded-lg hover:bg-red-50 hover:text-red-500 h-9 px-3 text-sm"
-        }
+        extraStyle={`text-gray-500 rounded-lg hover:bg-red-50 hover:text-red-500 h-9 ${
+          !onlyLike && "px-3"
+        } text-sm`}
         onClick={handleLike}
       >
         <svg

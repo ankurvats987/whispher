@@ -1,6 +1,8 @@
+import { useDispatch } from "react-redux";
 import getDateStamp from "../helper/accurate_timestamp";
 import CarouselPosts from "./CarouselPosts";
 import InteractionTab from "./InteractionTab";
+import { toggleReadMore } from "../features/post/postSlice";
 
 const ContentCard = ({
   content,
@@ -11,6 +13,8 @@ const ContentCard = ({
 }) => {
   const contentLength = content.content.length;
   const showReadMore = contentLength > 600;
+
+  const dispatch = useDispatch();
 
   return (
     <div
@@ -56,7 +60,13 @@ const ContentCard = ({
                 {content.content}
               </p>
               {showReadMore && (
-                <button className="text-blue-500 hover:text-blue-700 font-medium text-sm mt-1 cursor-pointer">
+                <button
+                  className="text-blue-500 hover:text-blue-700 font-medium text-sm mt-1 cursor-pointer"
+                  onClick={() => {
+                    console.log("read more clicked");
+                    dispatch(toggleReadMore(true));
+                  }}
+                >
                   Read More
                 </button>
               )}

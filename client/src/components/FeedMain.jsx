@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import ProfileContext from "../context/ProfileContext";
-import { cleanUp } from "../features/post/postSlice";
+import { cleanUp, toggleReadMore } from "../features/post/postSlice";
 import { Carousel } from "flowbite-react";
 import {
   createAPost,
@@ -90,6 +90,8 @@ const FeedMain = ({ showExplore = false }) => {
   };
 
   useEffect(() => {
+    dispatch(toggleReadMore(false));
+
     const fetchPosts = async () => {
       try {
         if (showExplore) {
@@ -109,7 +111,7 @@ const FeedMain = ({ showExplore = false }) => {
 
   if (postsLoading) {
     return (
-      <div className="flex justify-center items-center h-[calc(100vh-6rem)] bg-gradient-to-br from-rose-50 via-purple-50 to-teal-50">
+      <div className="flex justify-center items-center h-[calc(100vh-4.5rem)]">
         <span className="text-gray-500 text-lg">Loading posts...</span>
       </div>
     );

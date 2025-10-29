@@ -133,6 +133,7 @@ const postSlice = createSlice({
     createCommentLoading: false,
     createPostLoading: false,
     images: [],
+    readMore: false,
   },
   reducers: {
     cleanUp: (state, action) => {
@@ -148,6 +149,9 @@ const postSlice = createSlice({
       if (action.payload?.clearCurrentPost) {
         state.currentPost = null;
       }
+    },
+    toggleReadMore: (state, action) => {
+      state.readMore = action.payload || false;
     },
   },
   extraReducers: (builder) => {
@@ -256,5 +260,5 @@ const postSlice = createSlice({
   },
 });
 
-export const { cleanUp } = postSlice.actions;
+export const { cleanUp, toggleReadMore } = postSlice.actions;
 export default postSlice.reducer;
