@@ -11,6 +11,7 @@ import {
   unlikeComment,
   unlikePost,
 } from "../../service/postService";
+import imageCompression from "browser-image-compression";
 
 export const getAllPosts = createAsyncThunk("post/all", async (_, thunkAPI) => {
   try {
@@ -68,7 +69,7 @@ export const getAPost = createAsyncThunk(
 
 export const createAPost = createAsyncThunk(
   "post/create",
-  async (content, thunkAPI) => {
+  async ({ content, images = [] }, thunkAPI) => {
     try {
       const state = thunkAPI.getState();
       const user = state.user.user;
@@ -77,7 +78,27 @@ export const createAPost = createAsyncThunk(
         throw new Error("User ID not found in state");
       }
 
-      const response = await createPost({ content, createdBy: user.id });
+      const formData = new FormData();
+      formData.append("content", content);
+      formData.append("createdBy", user.id);
+
+      // images.forEach((file) => formData.append("images", file));
+
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        initialQuality: 0.8,
+      };
+
+      await Promise.all(
+        images.map(async (file) => {
+          const compressedFile = await imageCompression(file, options);
+          formData.append("images", compressedFile);
+        })
+      );
+
+      const response = await createPost(formData);
 
       return response.data.data;
     } catch (error) {

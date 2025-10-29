@@ -27,6 +27,7 @@ import {
   shareCount: Number,
   commentsCount: Number,
   createdAt: ISODateString,
+  images: []
   likedBy: [],
 }
 */
@@ -58,6 +59,7 @@ import {
   createdAt: ISODateString,
   updatedAt: ISODateString,
   likedBy: [],
+  images: [],
 }
 */
 
@@ -130,6 +132,7 @@ const postSlice = createSlice({
     searchPostLoading: true,
     createCommentLoading: false,
     createPostLoading: false,
+    images: [],
   },
   reducers: {
     cleanUp: (state, action) => {

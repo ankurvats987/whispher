@@ -13,7 +13,11 @@ export const getPost = async (postId) => {
 };
 
 export const createPost = async (postData) => {
-  return await api.post("/post/create", postData);
+  return await api.post("/post/create", postData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 export const createComment = async (postId, commentData) => {

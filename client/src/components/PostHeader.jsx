@@ -6,7 +6,7 @@ const PostHeader = () => {
   return (
     <header className="w-full bg-white">
       <div className="px-6 py-4 border-b border-gray-200">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
+        <div className="max-w-[100rem] mx-auto flex items-center justify-between">
           <div className="flex space-x-4 items-center">
             <Button
               extraStyle={

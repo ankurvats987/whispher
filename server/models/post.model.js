@@ -12,6 +12,12 @@ const postSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    images: [
+      {
+        type: String,
+        required: false,
+      },
+    ],
     shareCount: {
       type: Number,
       default: 0,

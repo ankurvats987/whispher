@@ -14,8 +14,9 @@ import {
   getFollowedPosts,
   searchPost,
 } from "../controllers/post.controller.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
-postRouter.post("/create", createPost);
+postRouter.post("/create", upload.array("images", 10), createPost);
 postRouter.get("/all", getAllPost);
 postRouter.get("/:id", getPost);
 postRouter.get("/search/:key", searchPost);

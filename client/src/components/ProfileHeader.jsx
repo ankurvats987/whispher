@@ -13,8 +13,6 @@ const ProfileHeader = ({ myProfile = false }) => {
     }
   });
 
-  console.log(myProfile);
-
   return (
     <header className="bg-white w-full border-b border-gray-200">
       <div className="px-6 py-4">

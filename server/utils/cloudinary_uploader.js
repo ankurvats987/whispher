@@ -15,11 +15,21 @@ cloudinary.config({
 
 export const uploadOnCloudinary = async (localFilePath) => {
   try {
-    if (!localFilePath) return null;
+    if (!localFilePath) {
+      console.error("No file path provided.");
+      return null;
+    }
+
+    if (!fs.existsSync(localFilePath)) {
+      console.error("File does not exist:", localFilePath);
+      return null;
+    }
 
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "image",
       secure: true,
+      quality: "auto:good",
+      fetchFormat: "auto",
     });
 
     fs.unlink(localFilePath, (err) => {

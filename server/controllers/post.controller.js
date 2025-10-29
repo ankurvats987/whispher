@@ -3,6 +3,7 @@ import { Follows } from "../models/follows.model.js";
 import { Likes } from "../models/likes.model.js";
 import { Post } from "../models/post.model.js";
 import { User } from "../models/user.model.js";
+import { uploadOnCloudinary } from "../utils/cloudinary_uploader.js";
 import { APIResponse } from "../utils/res_handler.js";
 
 const getAllPost = async (_, res) => {
@@ -62,15 +63,25 @@ const getFollowedPosts = async (req, res) => {
 
     const followed = await Follows.getFollowing(user._id);
 
-    const postsOfFollowing = (
-      await Promise.all(
-        followed.map(async (user) => {
-          const post = await Post.find({ createdBy: user._id });
+    const userIds = followed.map((user) => user._id);
 
-          return post;
-        })
-      )
-    ).flat();
+    const postsOfFollowing = await Post.find({
+      createdBy: { $in: userIds },
+    }).sort({ createdAt: -1 });
+
+    // const postsOfFollowing = (
+    //   await Promise.all(
+    //     followed.map(async (user) => {
+    //       const post = await Post.find({ createdBy: user._id }).sort({
+    //         createdAt: -1,
+    //       });
+
+    //       return post;
+    //     })
+    //   )
+    // ).flat();
+
+    console.log(postsOfFollowing);
 
     return APIResponse.success(
       "Followed Users",
@@ -94,7 +105,24 @@ const createPost = async (req, res) => {
   }
 
   try {
-    const newPost = await Post.create({ content, createdBy });
+    const images = req.files || [];
+    let urls = [];
+
+    if (images.length > 0) {
+      urls = (
+        await Promise.all(
+          images.map(async (image) => {
+            const filePath = image.path;
+
+            if (filePath) {
+              const imageObj = await uploadOnCloudinary(filePath);
+              return imageObj?.url || null;
+            }
+          })
+        )
+      ).filter(Boolean);
+    }
+    const newPost = await Post.create({ content, createdBy, images: urls });
     // const post = await Post.findById(newPost._id).withMoreInfo();
 
     const post = await Post.findById(newPost._id);

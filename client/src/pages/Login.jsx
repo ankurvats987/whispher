@@ -8,6 +8,7 @@ import { clearAuthError } from "../features/auth/authSlice";
 import ErrorMessage from "../components/ErrorMessage";
 import { loginUser } from "../features/auth/authThunks";
 import ForgotPassword from "../components/ForgotPassword";
+import { toast } from "react-toastify";
 
 export const Login = () => {
   const dispatch = useDispatch();
@@ -16,9 +17,15 @@ export const Login = () => {
   const authLoading = useSelector((state) => state.auth.loading);
   const from = location.state?.from?.pathname || "/feed";
 
+  const { message, code } = location.state || {};
+
   const [showLogin, setLogin] = useState(true);
 
   const [checked, setChecked] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [once, setOnce] = useState(true);
   const {
     register,
     setError,
@@ -44,11 +51,21 @@ export const Login = () => {
   };
 
   useEffect(() => {
+    if (once && message && code) {
+      code === 1 && toast.success(message);
+      setOnce(false);
+    }
+
     return () => {
       clearAuthError();
       setLogin(true);
     };
   }, [dispatch]);
+
+  const handleShowPassword = (e) => {
+    e.preventDefault();
+    setShowPassword((val) => !val);
+  };
 
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
@@ -103,15 +120,63 @@ export const Login = () => {
                     >
                       Password
                     </label>
-                    <input
-                      {...register("password", {
-                        required: "Password is required.",
-                      })}
-                      className="mt-2 flex w-full border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-xl border-gray-200 focus:border-purple-300 focus:ring-purple-200 h-12"
-                      id="password"
-                      placeholder="Enter your password"
-                      type="password"
-                    ></input>
+                    <div className="relative w-full">
+                      <input
+                        {...register("password", {
+                          required: "Password is required.",
+                        })}
+                        className="mt-2 flex w-full border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-xl border-gray-200 focus:border-purple-300 focus:ring-purple-200 h-12"
+                        id="password"
+                        placeholder="Enter your password"
+                        type={showPassword ? "text" : "password"}
+                      ></input>
+
+                      <div className="absolute right-3 top-[55%] -translate-y-1/2">
+                        <button
+                          className="cursor-pointer transition-transform duration-200 hover:scale-110"
+                          onClick={handleShowPassword}
+                        >
+                          {showPassword ? (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              class="w-4 h-4"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M3.98 8.223C2.68 9.55 1.75 11.156 1.5 12c1.5 4.5 5.5 7.5 10.5 7.5 1.875 0 3.645-.445 5.178-1.234m3.342-2.956C22.32 14.45 23.25 12.844 23.5 12c-1.5-4.5-5.5-7.5-10.5-7.5-1.875 0-3.645.445-5.178 1.234M3 3l18 18"
+                              />
+                            </svg>
+                          ) : (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke-width="1.5"
+                              stroke="currentColor"
+                              class="w-4 h-4"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.364 4.5 12 4.5c4.637 0 8.578 3.01 9.964 7.183.07.207.07.431 0 .639C20.577 16.49 16.636 19.5 12 19.5c-4.636 0-8.577-3.01-9.964-7.178z"
+                              />
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="3"
+                                fill="currentColor"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
                     {errors.password && (
                       <div className="text-red-500 text-xs ml-2">
                         {errors.password.message}

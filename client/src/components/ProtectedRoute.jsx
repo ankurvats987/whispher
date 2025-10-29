@@ -32,7 +32,15 @@ const ProtectedRoute = () => {
     );
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+  return isAuthenticated ? (
+    <Outlet />
+  ) : (
+    <Navigate
+      to="/login"
+      replace
+      state={{ message: "Successfully logged out!", code: 1 }}
+    />
+  );
 };
 
 export default ProtectedRoute;

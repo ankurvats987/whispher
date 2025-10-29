@@ -5,7 +5,7 @@ import FeedMain from "../components/FeedMain";
 const Explore = () => {
   return (
     <>
-      <FeedNav />;
+      <FeedNav />
       <FeedMain showExplore={true} />
     </>
   );

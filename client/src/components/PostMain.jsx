@@ -9,6 +9,7 @@ import { Button } from "./Button";
 import ContentCard from "./ContentCard";
 import InteractionTab from "./InteractionTab";
 import getDateStamp from "../helper/accurate_timestamp";
+import CarouselPosts from "./CarouselPosts";
 
 const PostMain = () => {
   const { postId } = useParams();
@@ -19,6 +20,8 @@ const PostMain = () => {
   const error = useSelector((state) => state.post.error);
   const currentUser = useSelector((state) => state.user.user);
 
+  const [currIdx, setCurrIdx] = useState(0);
+
   const createCommentLoading = useSelector(
     (state) => state.post.createCommentLoading
   );
@@ -28,6 +31,9 @@ const PostMain = () => {
   const { getAProfile } = useContext(ProfileContext);
   const navigate = useNavigate();
   const commentSectionRef = useRef(null);
+
+  const [showReadMore, setShowReadMore] = useState(false);
+  const [expand, setExpand] = useState(false);
 
   useEffect(() => {
     // Instantly scroll to the top of the page
@@ -43,7 +49,12 @@ const PostMain = () => {
     }
 
     const fetchPost = async () => {
-      await dispatch(getAPost(postId));
+      try {
+        const data = await dispatch(getAPost(postId)).unwrap();
+        setShowReadMore(data.post.content.length > 200);
+      } catch (error) {
+        console.error("Fetch Post Error:", error?.message);
+      }
     };
 
     fetchPost();
@@ -111,126 +122,172 @@ const PostMain = () => {
 
   if (currentPost) {
     return (
-      <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
-        <div className="text-card-foreground bg-white border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-          <div className="p-8">
-            <div className="flex items-center gap-x-4 mb-6">
-              <img
-                src={currentPost.createdBy.profilePicture}
-                alt="Profile Picture"
-                className="w-16 h-16 rounded-full object-cover hover:opacity-90 cursor-pointer"
-                onClick={(e) => handleProfileClick(e, currentPost.createdBy)}
-              />
-              <div className="flex-1">
-                <div className="flex space-x-2 text-gray-500 items-center">
-                  <span
-                    className="text-gray-800 font-semibold text-lg hover:underline cursor-pointer"
+      <div className="max-w-[100rem] mx-auto px-6 py-8 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
+          <div className="lg:col-span-3">
+            <div className="text-card-foreground bg-white border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="p-8">
+                <div className="flex items-center gap-x-4 mb-6">
+                  <img
+                    src={currentPost.createdBy.profilePicture}
+                    alt="Profile Picture"
+                    className="w-16 h-16 rounded-full object-cover hover:opacity-90 cursor-pointer"
                     onClick={(e) =>
                       handleProfileClick(e, currentPost.createdBy)
                     }
-                  >
-                    {currentPost.createdBy.displayName}
-                  </span>
-
-                  <span className>{currentPost.createdBy.username}</span>
-                </div>
-
-                <span className="text-gray-500">
-                  {getDateStamp(currentPost.createdAt)}
-                </span>
-              </div>
-            </div>
-            <div className="mb-4 leading-relaxed text-gray-900 text-lg">
-              <p>{currentPost.content}</p>
-            </div>
-            <InteractionTab content={currentPost} />
-          </div>
-        </div>
-
-        <div className="text-card-foreground bg-white border-gray-200 rounded-xl shadow-sm">
-          <div className="p-6">
-            <div className="space-x-4 flex">
-              <img
-                src={currentUser.profilePicture}
-                alt="Your Profile Picture"
-                className="h-12 w-12 rounded-full object-cover"
-              />
-
-              <div className="flex-1 space-y-3">
-                <textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  name="comment"
-                  id="comment"
-                  className="w-full resize-none flex min-h-[80px] border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                  placeholder="Add a comment..."
-                  maxLength={300}
-                ></textarea>
-
-                <div className="flex items-center justify-between">
-                  <div className="text-gray-400 text-sm">
-                    <span>{comment.length}/300</span>
-                  </div>
-
-                  <Button
-                    extraStyle={
-                      "disabled:opacity-50 h-10 px-4 py-2 bg-gradient-to-r from-rose-400 to-purple-400 rounded-lg text-white text-sm cursor-pointer hover:from-rose-500 hover:to-purple-500"
-                    }
-                    title={
-                      createCommentLoading ? (
-                        <span className="flex items-center">
-                          <svg
-                            className="animate-spin h-4 w-4 mr-2"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                              fill="none"
-                            />
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            />
-                          </svg>
-                          Commenting...
-                        </span>
-                      ) : (
-                        "Comment"
-                      )
-                    }
-                    isDisabled={!comment.trim() || createCommentLoading}
-                    onClick={handleAddComment}
                   />
+                  <div className="flex-1">
+                    <div className="flex space-x-2 text-gray-500 items-center">
+                      <span
+                        className="text-gray-800 font-semibold text-lg hover:underline cursor-pointer"
+                        onClick={(e) =>
+                          handleProfileClick(e, currentPost.createdBy)
+                        }
+                      >
+                        {currentPost.createdBy.displayName}
+                      </span>
+
+                      <span className>@{currentPost.createdBy.username}</span>
+                    </div>
+
+                    <span className="text-gray-500">
+                      {getDateStamp(currentPost.createdAt)}
+                    </span>
+                  </div>
                 </div>
+
+                <CarouselPosts
+                  images={currentPost.images}
+                  extraStyle="mb-4"
+                  currIdx={currIdx}
+                  setCurrIdx={setCurrIdx}
+                />
+
+                <div className="mb-4 leading-relaxed text-gray-900 text-lg relative">
+                  <p
+                    className={`break-words whitespace-pre-wrap ${
+                      showReadMore && !expand && "line-clamp-10"
+                    }`}
+                  >
+                    {currentPost.content}
+                  </p>
+
+                  {showReadMore && (
+                    <button
+                      className="text-blue-500 hover:text-blue-700 font-medium text-sm mt-1 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpand((val) => !val);
+                      }}
+                    >
+                      {expand ? "Show Less" : "Read More"}
+                    </button>
+                  )}
+                </div>
+                <InteractionTab content={currentPost} />
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-3 space-y-6">
+            <div className="text-card-foreground bg-white border-gray-200 rounded-xl shadow-sm">
+              <div className="p-6">
+                <div className="space-x-4 flex">
+                  <img
+                    src={currentUser.profilePicture}
+                    alt="Your Profile Picture"
+                    className="h-12 w-12 rounded-full object-cover"
+                  />
+
+                  <div className="flex-1 space-y-3">
+                    <textarea
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      name="comment"
+                      id="comment"
+                      className="w-full resize-none flex min-h-[80px] border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                      placeholder="Add a comment..."
+                      maxLength={300}
+                    ></textarea>
+
+                    <div className="flex items-center justify-between">
+                      <div className="text-gray-400 text-sm">
+                        <span>{comment.length}/300</span>
+                      </div>
+
+                      <Button
+                        extraStyle={
+                          "disabled:opacity-50 h-10 px-4 py-2 bg-gradient-to-r from-rose-400 to-purple-400 rounded-lg text-white text-sm cursor-pointer hover:from-rose-500 hover:to-purple-500"
+                        }
+                        title={
+                          createCommentLoading ? (
+                            <span className="flex items-center">
+                              <svg
+                                className="animate-spin h-4 w-4 mr-2"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                  fill="none"
+                                />
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                />
+                              </svg>
+                              Commenting...
+                            </span>
+                          ) : (
+                            "Comment"
+                          )
+                        }
+                        isDisabled={!comment.trim() || createCommentLoading}
+                        onClick={handleAddComment}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col bg-white space-y-6 rounded-xl shadow-sm ">
+              <div className="px-6 py-4 pt-4 border-b border-gray-300">
+                <h3
+                  ref={commentSectionRef}
+                  className="text-gray-900 font-semibold text-lg pt-1"
+                >
+                  Comments
+                </h3>
+              </div>
+
+              <div className="px-6 pb-2 space-y-6 max-h-[60rem] overflow-y-auto scrollbar">
+                {currentPost.comments.length === 0 ? (
+                  <div className="w-full flex justify-center p-8">
+                    <span className="text-gray-500">No comments here.</span>
+                  </div>
+                ) : (
+                  currentPost.comments.map((comment) => (
+                    <ContentCard
+                      key={comment._id}
+                      content={comment}
+                      postId={postId}
+                      profileClickHandler={(e) =>
+                        handleProfileClick(e, comment.createdBy)
+                      }
+                      onlyLike={true}
+                    />
+                  ))
+                )}
               </div>
             </div>
           </div>
         </div>
-
-        <h3
-          ref={commentSectionRef}
-          className="text-gray-900 font-semibold text-lg pt-1"
-        >
-          Comments
-        </h3>
-
-        {currentPost.comments.map((comment) => (
-          <ContentCard
-            key={comment._id}
-            content={comment}
-            postId={postId}
-            profileClickHandler={(e) =>
-              handleProfileClick(e, comment.createdBy)
-            }
-            onlyLike={true}
-          />
-        ))}
       </div>
     );
   }
