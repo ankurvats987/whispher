@@ -9,6 +9,7 @@ import {
   updateProfile,
 } from "../../service/userService";
 import { setProfileData } from "./userSlice";
+import axios from "axios";
 
 export const getUserData = createAsyncThunk(
   "/user/username/profile",
@@ -141,12 +142,18 @@ export const update = createAsyncThunk(
 
 export const searchUser = createAsyncThunk(
   "/user/search",
-  async (key, thunkAPI) => {
+  async ({ key, signal }, thunkAPI) => {
     try {
-      const response = await search(key);
+      console.log(key);
+      const response = await search(key, signal);
 
       return response.data.data;
     } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log("Previous search cancelled.");
+        return thunkAPI.fulfillWithValue([]);
+      }
+
       const errMsg =
         error?.response?.data?.message ||
         "Something went wrong while searching";

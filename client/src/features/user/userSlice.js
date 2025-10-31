@@ -44,6 +44,7 @@ const userSlice = createSlice({
       searching: null,
     },
     searchedUser: [],
+    selectedUser: "",
   },
   reducers: {
     setProfileData: (state, action) => {
@@ -79,6 +80,9 @@ const userSlice = createSlice({
         Object.keys(state.error).map((k) => [k, null])
       );
       state.currentUserData = null;
+    },
+    setSelectedUser: (state, action) => {
+      state.selectedUser = action?.payload || "";
     },
   },
   extraReducers: (builder) => {
@@ -252,5 +256,6 @@ export const amIFollowing = (state, user) => {
   return state.user.user.following.some((masters) => masters._id === user._id);
 };
 
-export const { setProfileData, clearUserData, reset } = userSlice.actions;
+export const { setProfileData, clearUserData, reset, setSelectedUser } =
+  userSlice.actions;
 export default userSlice.reducer;

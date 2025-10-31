@@ -3,6 +3,7 @@ import getDateStamp from "../helper/accurate_timestamp";
 import CarouselPosts from "./CarouselPosts";
 import InteractionTab from "./InteractionTab";
 import { toggleReadMore } from "../features/post/postSlice";
+import { useNavigate } from "react-router";
 
 const ContentCard = ({
   content,
@@ -15,6 +16,11 @@ const ContentCard = ({
   const showReadMore = contentLength > 600;
 
   const dispatch = useDispatch();
+
+  const text = content.content;
+  const parts = text.split(/(@\w+)/g);
+
+  const navigate = useNavigate();
 
   return (
     <div
@@ -57,13 +63,26 @@ const ContentCard = ({
                   showReadMore && "line-clamp-10"
                 } `}
               >
-                {content.content}
+                {parts.map((part, i) => {
+                  return part.startsWith("@") ? (
+                    <span
+                      key={i}
+                      className="cursor-pointer text-blue-950"
+                      onClick={() => {
+                        navigate(`/profile/${part.substring(1)}`);
+                      }}
+                    >
+                      {part}
+                    </span>
+                  ) : (
+                    <span key={i}>{part}</span>
+                  );
+                })}
               </p>
               {showReadMore && (
                 <button
                   className="text-blue-500 hover:text-blue-700 font-medium text-sm mt-1 cursor-pointer"
                   onClick={() => {
-                    console.log("read more clicked");
                     dispatch(toggleReadMore(true));
                   }}
                 >
@@ -108,7 +127,21 @@ const ContentCard = ({
                     showReadMore && "line-clamp-10"
                   } `}
                 >
-                  {content.content}
+                  {parts.map((part, i) => {
+                    return part.startsWith("@") ? (
+                      <span
+                        key={i}
+                        className="cursor-pointer text-blue-500"
+                        onClick={() => {
+                          navigate(`/profile/${part.substring(1)}`);
+                        }}
+                      >
+                        {part}
+                      </span>
+                    ) : (
+                      <span key={i}>{part}</span>
+                    );
+                  })}
                 </p>
                 {showReadMore && (
                   <button className="text-blue-500 hover:text-blue-700 font-medium text-sm mt-1 cursor-pointer">

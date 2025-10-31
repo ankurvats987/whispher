@@ -39,7 +39,7 @@ const SearchDetails = () => {
 
     const fetchUsers = async () => {
       try {
-        await dispatch(searchUser(searchKey)).unwrap();
+        await dispatch(searchUser({ key: searchKey })).unwrap();
       } catch (error) {
         console.log(searchPostsErr);
         console.error(error);

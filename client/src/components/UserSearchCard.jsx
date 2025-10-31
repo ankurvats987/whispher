@@ -1,11 +1,14 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import FollowButton from "./FollowButton";
+import { setSelectedUser } from "../features/user/userSlice";
 
-const UserSearchCard = ({ user }) => {
+const UserSearchCard = ({ user, tag = false }) => {
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.user);
   const isCurrentUser = user._id === currentUser.id;
+
+  const dispatch = useDispatch();
 
   const handleProfileClick = () => {
     navigate(`/profile/${user.username}`, {
@@ -13,12 +16,20 @@ const UserSearchCard = ({ user }) => {
     });
   };
 
+  const selectUser = () => {
+    dispatch(setSelectedUser(user.username));
+  };
+
   return (
-    <div className="flex items-center justify-between p-4 bg-white rounded-lg hover:bg-gray-50 transition-colors border border-gray-200">
+    <div
+      className={`flex items-center justify-between hover:bg-gray-50 transition-colors p-4 ${
+        !tag && "bg-white rounded-lg  border border-gray-200"
+      }`}
+    >
       {/* Left: Avatar + Info */}
       <div
         className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
-        onClick={handleProfileClick}
+        onClick={tag ? selectUser : handleProfileClick}
       >
         <img
           src={user.profilePicture || "/default-avatar.png"}
@@ -45,7 +56,7 @@ const UserSearchCard = ({ user }) => {
             You
           </span>
         ) : (
-          <FollowButton user={user} />
+          !tag && <FollowButton user={user} />
         )}
       </div>
     </div>

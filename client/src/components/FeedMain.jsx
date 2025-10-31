@@ -13,6 +13,7 @@ import {
 import { Button } from "./Button";
 import ContentCard from "./ContentCard";
 import CarouselImageViewer from "./CarouselImageViewer";
+import InputContainer from "./InputContainer";
 
 const FeedMain = ({ showExplore = false }) => {
   const dispatch = useDispatch();
@@ -70,12 +71,6 @@ const FeedMain = ({ showExplore = false }) => {
     setCurrIdx(index);
   };
 
-  const handleProfileClick = (e, createdBy) => {
-    e.stopPropagation();
-    console.log("profile clicked");
-    navigate(`/profile/${createdBy.username}`);
-  };
-
   const handleCreatePost = async () => {
     try {
       await dispatch(createAPost({ content: post, images: files })).unwrap();
@@ -87,6 +82,11 @@ const FeedMain = ({ showExplore = false }) => {
     } catch (error) {
       toast.error(error || "Something went wrong while creating the post");
     }
+  };
+
+  const handleProfileClick = (e, createdBy) => {
+    e.stopPropagation();
+    navigate(`/profile/${createdBy.username}`);
   };
 
   useEffect(() => {
@@ -367,6 +367,12 @@ const FeedMain = ({ showExplore = false }) => {
                         </div>
                       </div>
                     ) : (
+                      // <InputContainer
+                      //   clickHandler={handleCreatePost}
+                      //   loadingState={createPostLoading}
+                      //   user={currentUser}
+                      //   setEditable={setEditable}
+                      // />
                       <Button
                         extraStyle={
                           "hover:text-accent-foreground px-4 py-2 w-full justify-start text-left text-gray-500 hover:bg-gray-50 rounded-lg h-12 cursor-text"

@@ -28,6 +28,8 @@ export const updateProfile = async (username, data) => {
   });
 };
 
-export const search = async (key) => {
-  return await api.get(`/user/search/${key}`);
+export const search = async (key, signal) => {
+  return signal
+    ? await api.get(`/user/search/${key}`, { signal })
+    : await api.get(`/user/search/${key}`);
 };
