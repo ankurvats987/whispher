@@ -67,8 +67,9 @@ const ContentCard = ({
                   return part.startsWith("@") ? (
                     <span
                       key={i}
-                      className="cursor-pointer text-blue-950"
-                      onClick={() => {
+                      className="cursor-pointer text-blue-500 transition-transform hover:scale-120 duration-300"
+                      onClick={(e) => {
+                        e.stopPropagation();
                         navigate(`/profile/${part.substring(1)}`);
                       }}
                     >

@@ -18,9 +18,9 @@ export const SearchUsers = ({ searchedTerm }) => {
 
   const abortControllerRef = useRef(null);
 
-  useEffect(() => {
-    console.log("Inside SearchUsers: ", searchedTerm);
-  }, [searchedTerm]);
+  // useEffect(() => {
+  //   console.log("Inside SearchUsers: ", searchedTerm);
+  // }, [searchedTerm]);
 
   useEffect(() => {
     if (abortControllerRef.current) abortControllerRef.current.abort();

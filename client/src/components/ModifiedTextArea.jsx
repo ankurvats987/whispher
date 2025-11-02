@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../features/user/userSlice";
-import { Button } from "./Button";
 import { SearchUsers } from "./SearchUsers";
 
 const ModifiedTextArea = ({ value, setValue, mode }) => {
@@ -57,6 +56,7 @@ const ModifiedTextArea = ({ value, setValue, mode }) => {
       setSearchedUser((prev) => ({
         ...prev,
         start: value.length - 1,
+        user: "",
       }));
     } else if (showUsers && (lastChar === " " || value.length === 0)) {
       setShowUsers(false);
@@ -68,9 +68,8 @@ const ModifiedTextArea = ({ value, setValue, mode }) => {
     } else if (showUsers) {
       setSearchedUser((prev) => ({
         ...prev,
-        user: value.substring(prev.start + 1),
+        user: value.substring(prev.start + 1) || "",
       }));
-      console.log("@ activated. username:", searchedUser.user);
     }
     setValue(e.target.value);
   };
@@ -83,8 +82,10 @@ const ModifiedTextArea = ({ value, setValue, mode }) => {
         onChange={handleValueChange}
         name={mode}
         id={mode}
-        className="w-full resize-none flex min-h-[80px] border border-gray-300 rounded-lg px-3 py-2 text-sm"
-        placeholder={mode === "comment" ? "Add a comment..." : ""}
+        className="w-full resize-none flex min-h-[80px] border border-gray-300 rounded-lg px-3 py-2 text-sm bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 focus:border-gray-500"
+        placeholder={
+          mode === "comment" ? "Add a comment..." : "Share your thoughts"
+        }
         maxLength={mode === "comment" ? 300 : 1500}
       ></textarea>
       {showUsers && (

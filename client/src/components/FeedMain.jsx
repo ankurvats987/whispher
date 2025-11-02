@@ -4,7 +4,6 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import ProfileContext from "../context/ProfileContext";
 import { cleanUp, toggleReadMore } from "../features/post/postSlice";
-import { Carousel } from "flowbite-react";
 import {
   createAPost,
   getAllPosts,
@@ -14,6 +13,7 @@ import { Button } from "./Button";
 import ContentCard from "./ContentCard";
 import CarouselImageViewer from "./CarouselImageViewer";
 import InputContainer from "./InputContainer";
+import ModifiedTextArea from "./ModifiedTextArea";
 
 const FeedMain = ({ showExplore = false }) => {
   const dispatch = useDispatch();
@@ -208,7 +208,7 @@ const FeedMain = ({ showExplore = false }) => {
                           />
 
                           <div className="flex flex-col flex-1">
-                            <textarea
+                            {/* <textarea
                               value={post}
                               onChange={(e) => setPost(e.target.value)}
                               name="write-post"
@@ -216,7 +216,12 @@ const FeedMain = ({ showExplore = false }) => {
                               placeholder="Share your thoughts"
                               className="flex min-h-[80px] w-full border bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 border-gray-300 focus:border-gray-500 resize-none rounded-lg"
                               maxLength={1500}
-                            ></textarea>
+                            ></textarea> */}
+                            <ModifiedTextArea
+                              value={post}
+                              setValue={setPost}
+                              mode={"post"}
+                            />
                             <div className="text-gray-500 text-right mt-2">
                               <span>{post.length}</span>
                               <span>/1500</span>

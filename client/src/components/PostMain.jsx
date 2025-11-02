@@ -85,34 +85,34 @@ const PostMain = () => {
     });
   };
 
-  useEffect(() => {
-    if (selectedUser !== "") {
-      const textarea = textAreaRef.current;
+  // useEffect(() => {
+  //   if (selectedUser !== "") {
+  //     const textarea = textAreaRef.current;
 
-      const currentValue = textarea.value;
+  //     const currentValue = textarea.value;
 
-      const newValue =
-        currentValue.substring(0, searchedUser.start + 1) + selectedUser + " ";
+  //     const newValue =
+  //       currentValue.substring(0, searchedUser.start + 1) + selectedUser + " ";
 
-      textarea.value = newValue;
-      setComment(newValue);
+  //     textarea.value = newValue;
+  //     setComment(newValue);
 
-      setShowUsers(false);
-      setSearchedUser((prev) => ({
-        ...prev,
-        start: -1,
-        user: "",
-      }));
+  //     setShowUsers(false);
+  //     setSearchedUser((prev) => ({
+  //       ...prev,
+  //       start: -1,
+  //       user: "",
+  //     }));
 
-      textarea.focus();
+  //     textarea.focus();
 
-      const end = textarea.value.length;
-      textarea.selectionStart = end;
-      textarea.selectionEnd = end;
+  //     const end = textarea.value.length;
+  //     textarea.selectionStart = end;
+  //     textarea.selectionEnd = end;
 
-      dispatch(setSelectedUser(""));
-    }
-  }, [selectedUser]);
+  //     dispatch(setSelectedUser(""));
+  //   }
+  // }, [selectedUser]);
 
   const handleAddComment = async (e) => {
     e.stopPropagation();
@@ -241,7 +241,22 @@ const PostMain = () => {
                       showReadMore && !expand && "line-clamp-10"
                     }`}
                   >
-                    {currentPost.content}
+                    {currentPost.content.split(/(@\w+)/g).map((part, i) => {
+                      return part.startsWith("@") ? (
+                        <span
+                          key={i}
+                          className="cursor-pointer text-blue-500 transition-transform hover:scale-120 duration-300"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/profile/${part.substring(1)}`);
+                          }}
+                        >
+                          {part}
+                        </span>
+                      ) : (
+                        <span key={i}>{part}</span>
+                      );
+                    })}
                   </p>
 
                   {showReadMore && (
@@ -339,11 +354,11 @@ const PostMain = () => {
                 </div>
               </div>
 
-              {showUsers && (
+              {/* {showUsers && (
                 <div className="absolute inset-x-0 bottom-0 top-[100%] bg-gray-100 shadow-xl border-gray-300 border-1 h-60 w-full rounded-b-xl z-50 overflow-y-scroll">
                   <SearchUsers searchedTerm={searchedUser.user} />
                 </div>
-              )}
+              )} */}
             </div>
 
             <div className="flex flex-col bg-white space-y-6 rounded-xl shadow-sm ">

@@ -1046,8 +1046,6 @@ const searchUser = async (req, res) => {
     if (key === "") {
       searchedUsers = users;
     } else {
-      console.log(key);
-
       users.forEach((user) => {
         if (
           user.username.toLowerCase().includes(key.toLowerCase()) ||

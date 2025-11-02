@@ -5,6 +5,8 @@ import express from "express";
 import { authenticate } from "./middlewares/authenticate.middleware.js";
 import postRouter from "./routes/post.route.js";
 import userRouter from "./routes/user.route.js";
+import http, { Server } from "http";
+import setupSocket from "./sockets/index.js";
 
 dotenv.config({
   path: "./.env",
@@ -42,7 +44,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
   res.status(200).json({
     status: "ok",
     message: "You pinged the server!",
@@ -52,6 +54,15 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/post", authenticate, postRouter);
-// app.get("/followed-posts", getFollowedPosts);
 
-export { app };
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+  },
+});
+
+setupSocket(io);
+
+export { server };

@@ -144,13 +144,11 @@ export const searchUser = createAsyncThunk(
   "/user/search",
   async ({ key, signal }, thunkAPI) => {
     try {
-      console.log(key);
       const response = await search(key, signal);
 
       return response.data.data;
     } catch (error) {
       if (axios.isCancel(error)) {
-        console.log("Previous search cancelled.");
         return thunkAPI.fulfillWithValue([]);
       }
 
