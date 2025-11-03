@@ -64,6 +64,37 @@ export const sendCommentMentionNotification = async (
       io.to(targetSocket).emit("notification", notification);
     }
   } catch (error) {
-    console.error("Failed to create comment notification:", error);
+    console.error("Failed to create comment mention notification:", error);
+  }
+};
+
+export const sendCommentLikeNotification = async (
+  post,
+  sender,
+  reciever,
+  comment
+) => {
+  try {
+    const targetSocket = userSocketMap.get(reciever._id.toString());
+
+    const notification = await Notification.create({
+      reciever: reciever._id,
+      sender: sender._id,
+      type: "like-comment",
+      post: post._id,
+      comment: comment._id,
+      message: `@${sender.username} liked your comment.`,
+    });
+
+    await notification.populate([
+      { path: "reciever", select: "_id username displayName profilePicture" },
+      { path: "sender", select: "_id username displayName profilePicture" },
+    ]);
+
+    if (io && targetSocket) {
+      io.to(targetSocket).emit("notification", notification);
+    }
+  } catch (error) {
+    console.error("Failed to create comment like notification:", error);
   }
 };

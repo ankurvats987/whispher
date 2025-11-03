@@ -2,6 +2,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   createComment,
   createPost,
+  deleteComment,
+  deletePost,
   getFollowedPosts,
   getPost,
   getPosts,
@@ -12,6 +14,7 @@ import {
   unlikePost,
 } from "../../service/postService";
 import imageCompression from "browser-image-compression";
+import { deleteCurrentPost } from "../user/userSlice";
 
 export const getAllPosts = createAsyncThunk("post/all", async (_, thunkAPI) => {
   try {
@@ -19,9 +22,7 @@ export const getAllPosts = createAsyncThunk("post/all", async (_, thunkAPI) => {
 
     return response.data.data;
   } catch (error) {
-    const errMsg =
-      error?.response?.data?.message ||
-      "Something went wrong while fetching posts";
+    const errMsg = error || "Something went wrong while fetching posts";
 
     console.error("Error in fetching posts:", errMsg);
     return thunkAPI.rejectWithValue(errMsg);
@@ -39,9 +40,7 @@ export const getUserPosts = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while fetching user posts";
+      const errMsg = error || "Something went wrong while fetching user posts";
 
       console.error("Error in fetching user posts:", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -57,9 +56,7 @@ export const getAPost = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while fetching the post";
+      const errMsg = error || "Something went wrong while fetching the post";
 
       console.error("Error in fetching the post:", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -102,9 +99,7 @@ export const createAPost = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while creating the post";
+      const errMsg = error || "Something went wrong while creating the post";
 
       console.error("Error in creating the post:", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -126,9 +121,7 @@ export const createAComment = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while creating the comment";
+      const errMsg = error || "Something went wrong while creating the comment";
 
       console.error("Error in creating the comment:", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -147,9 +140,7 @@ export const likeAComment = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while liking the comment";
+      const errMsg = error || "Something went wrong while liking the comment";
 
       console.error("Error in liking the comment:", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -168,9 +159,7 @@ export const unlikeAComment = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while unliking the comment";
+      const errMsg = error || "Something went wrong while unliking the comment";
 
       console.error("Error in unliking the comment:", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -189,9 +178,7 @@ export const likeAPost = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while liking the post";
+      const errMsg = error || "Something went wrong while liking the post";
 
       console.error("Error in liking the post", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -210,9 +197,7 @@ export const unlikeAPost = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while unliking the post";
+      const errMsg = error || "Something went wrong while unliking the post";
 
       console.error("Error in unliking the post", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -228,11 +213,48 @@ export const searchPost = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while searching the posts";
+      const errMsg = error || "Something went wrong while searching the posts";
 
       console.error("Error in searching the posts", errMsg);
+      return thunkAPI.rejectWithValue(errMsg);
+    }
+  }
+);
+
+export const postDelete = createAsyncThunk(
+  "post/postId/delete",
+  async (postId, thunkAPI) => {
+    try {
+      const response = await deletePost(postId);
+
+      const state = thunkAPI.getState();
+      const currentUser = state.user.currentUserData;
+
+      if (currentUser && currentUser.posts && currentUser.posts.length > 0) {
+        thunkAPI.dispatch(deleteCurrentPost(postId));
+      }
+
+      return response.data.data;
+    } catch (error) {
+      const errMsg = error || "Something went wrong while deleting the post";
+
+      console.error("Error in deleting the post", errMsg);
+      return thunkAPI.rejectWithValue(errMsg);
+    }
+  }
+);
+
+export const commentDelete = createAsyncThunk(
+  "post/comment/commentId/delete",
+  async (commentId, thunkAPI) => {
+    try {
+      const response = await deleteComment(commentId);
+
+      return response.data.data;
+    } catch (error) {
+      const errMsg = error || "Something went wrong while deleting the comment";
+
+      console.error("Error in deleting the comment", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
     }
   }

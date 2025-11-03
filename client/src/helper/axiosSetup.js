@@ -7,7 +7,6 @@ export const setupAxiosInterceptors = (store) => {
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("Authorization header set");
     } else {
       console.log("No token found, skipping Authorization header");
     }

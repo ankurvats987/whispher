@@ -56,5 +56,3 @@ export const getMonthAndYear = (createdAt) => {
 };
 
 export default getDateStamp;
-
-console.log(getDateStamp("2024-07-01T10:00:00.000Z"));

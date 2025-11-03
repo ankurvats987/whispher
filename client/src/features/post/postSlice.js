@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  commentDelete,
   createAComment,
   createAPost,
   getAllPosts,
@@ -7,6 +8,7 @@ import {
   getUserPosts,
   likeAComment,
   likeAPost,
+  postDelete,
   searchPost,
   unlikeAComment,
   unlikeAPost,
@@ -132,8 +134,11 @@ const postSlice = createSlice({
     searchPostLoading: true,
     createCommentLoading: false,
     createPostLoading: false,
+    postDeleteLoading: false,
+    commentDeleteLoading: false,
     images: [],
     readMore: false,
+    toggleMenu: null,
   },
   reducers: {
     cleanUp: (state, action) => {
@@ -145,6 +150,8 @@ const postSlice = createSlice({
 
       state.createCommentLoading = false;
       state.createPostLoading = false;
+      state.postDeleteLoading = false;
+      state.commentDeleteLoading = false;
 
       if (action.payload?.clearCurrentPost) {
         state.currentPost = null;
@@ -152,6 +159,9 @@ const postSlice = createSlice({
     },
     toggleReadMore: (state, action) => {
       state.readMore = action.payload || false;
+    },
+    setToggleMenu: (state, action) => {
+      state.toggleMenu = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -256,9 +266,53 @@ const postSlice = createSlice({
       .addCase(searchPost.pending, (state) => {
         state.searchPostLoading = true;
         state.searchPostError = null;
+      })
+
+      // Post Delete
+      .addCase(postDelete.pending, (state) => {
+        state.postDeleteLoading = true;
+      })
+      .addCase(postDelete.fulfilled, (state, action) => {
+        state.postDeleteLoading = false;
+
+        const postId = action.payload.postId;
+        state.posts = state.posts.filter((post) => post._id !== postId);
+      })
+      .addCase(postDelete.rejected, (state) => {
+        state.postDeleteLoading = false;
+      })
+
+      // Comment Delete
+      .addCase(commentDelete.pending, (state) => {
+        state.commentDeleteLoading = true;
+      })
+      .addCase(commentDelete.fulfilled, (state, action) => {
+        state.commentDeleteLoading = false;
+
+        const { postId, commentId } = action.payload;
+
+        state.posts = state.posts.map((post) => {
+          if (post._id === postId) {
+            return {
+              ...post,
+              comments: post.comments.filter(
+                (comment) => comment._id !== commentId
+              ),
+            };
+          } else {
+            return post;
+          }
+        });
+
+        state.currentPost.comments = state.currentPost.comments.filter(
+          (comment) => comment._id !== commentId
+        );
+      })
+      .addCase(commentDelete.rejected, (state) => {
+        state.commentDeleteLoading = false;
       });
   },
 });
 
-export const { cleanUp, toggleReadMore } = postSlice.actions;
+export const { cleanUp, toggleReadMore, setToggleMenu } = postSlice.actions;
 export default postSlice.reducer;

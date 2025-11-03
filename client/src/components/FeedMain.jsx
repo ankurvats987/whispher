@@ -1,8 +1,7 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import ProfileContext from "../context/ProfileContext";
 import { cleanUp, toggleReadMore } from "../features/post/postSlice";
 import {
   createAPost,
@@ -10,12 +9,12 @@ import {
   getUserPosts,
 } from "../features/post/postThunks";
 import { Button } from "./Button";
-import ContentCard from "./ContentCard";
 import CarouselImageViewer from "./CarouselImageViewer";
-import InputContainer from "./InputContainer";
+import ContentCard from "./ContentCard";
 import ModifiedTextArea from "./ModifiedTextArea";
 
 const FeedMain = ({ showExplore = false }) => {
+  const location = useLocation();
   const dispatch = useDispatch();
   const [editable, setEditable] = useState(false);
   const [post, setPost] = useState("");
@@ -38,8 +37,6 @@ const FeedMain = ({ showExplore = false }) => {
 
   const fileInputRef = useRef(null);
 
-  // const { getAProfile, amIFollowing, getAllProfiles } =
-  //   useContext(ProfileContext);
   const navigate = useNavigate();
 
   const addImageHandler = (e) => {

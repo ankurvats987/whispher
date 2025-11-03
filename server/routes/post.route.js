@@ -13,6 +13,8 @@ import {
   getAllPost,
   getFollowedPosts,
   searchPost,
+  deletePost,
+  deleteComment,
 } from "../controllers/post.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -28,5 +30,8 @@ postRouter.post("/:id/unlike", unlikePost);
 postRouter.post("/:id/comment", createComment);
 postRouter.post("/comment/:id/like", likeComment);
 postRouter.post("/comment/:id/unlike", unlikeComment);
+
+postRouter.delete("/:id", deletePost);
+postRouter.delete("/comment/:id", deleteComment);
 
 export default postRouter;

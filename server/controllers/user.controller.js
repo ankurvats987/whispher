@@ -7,6 +7,7 @@ import { Post } from "../models/post.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary_uploader.js";
 import nodemailer from "nodemailer";
 import { Notification } from "../models/notification.model.js";
+import { sendFollowNotification } from "../sockets/userHandler.js";
 
 const setAuthTokens = async (userId, username, res) => {
   // Prepare the payload for access token
@@ -384,12 +385,14 @@ const follow = async (req, res) => {
     const userB = await User.findOne({ username });
 
     if (!userA || !userB) {
-      return APIResponse.error("User(s) do not not exist!", null, 404).send(
+      return APIResponse.error("User(s) do not not exist!", null, 400).send(
         res
       );
     }
 
     await Follows.follow(userA, userB);
+
+    sendFollowNotification(userA, userB);
 
     return APIResponse.success("Followed successfully", null, 200).send(res);
   } catch (error) {
@@ -418,6 +421,17 @@ const unfollow = async (req, res) => {
     }
 
     await Follows.unfollow(userA, userB);
+
+    const notfOptions = {
+      sender: userA._id,
+      type: "follow",
+      reciever: userB._id,
+    };
+
+    const notf = await Notification.findOne(notfOptions);
+    if (notf) {
+      await Notification.findOneAndDelete(notfOptions);
+    }
 
     return APIResponse.success("Unfollowed successfully", null, 200).send(res);
   } catch (error) {

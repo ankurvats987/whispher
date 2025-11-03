@@ -43,3 +43,11 @@ export const unlikePost = async (postId, likedBy) => {
 export const search = async (key) => {
   return await api.get(`/post/search/${key}`);
 };
+
+export const deletePost = async (id) => {
+  return await api.delete(`/post/${id}`);
+};
+
+export const deleteComment = async (id) => {
+  return await api.delete(`/post/comment/${id}`);
+};

@@ -1,18 +1,16 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
-import ProfileContext from "../context/ProfileContext";
-import { cleanUp, toggleReadMore } from "../features/post/postSlice";
+import { cleanUp } from "../features/post/postSlice";
 import { createAComment, getAPost } from "../features/post/postThunks";
+import getDateStamp from "../helper/accurate_timestamp";
 import { Button } from "./Button";
+import CarouselPosts from "./CarouselPosts";
 import ContentCard from "./ContentCard";
 import InteractionTab from "./InteractionTab";
-import getDateStamp from "../helper/accurate_timestamp";
-import CarouselPosts from "./CarouselPosts";
-import { SearchUsers } from "./SearchUsers";
-import { setSelectedUser } from "../features/user/userSlice";
 import ModifiedTextArea from "./ModifiedTextArea";
+import MoreOptions from "./MoreOptions";
 
 const PostMain = () => {
   const { postId } = useParams();
@@ -31,7 +29,6 @@ const PostMain = () => {
 
   const [comment, setComment] = useState("");
   const location = useLocation();
-  const { getAProfile } = useContext(ProfileContext);
   const navigate = useNavigate();
   const commentSectionRef = useRef(null);
 
@@ -42,25 +39,11 @@ const PostMain = () => {
 
   const [showUsers, setShowUsers] = useState(false);
 
-  const [searchedUser, setSearchedUser] = useState({ start: -1, user: "" });
+  const commentNotf = location.state?.comment;
 
-  const textAreaRef = useRef(null);
-
-  const selectedUser = useSelector((state) => state.user.selectedUser);
+  const commentRefs = useRef({});
 
   useEffect(() => {
-    // Instantly scroll to the top of the page
-    window.scrollTo({ top: 0, behavior: "auto" });
-
-    const showComments = location.state?.openComments;
-    if (showComments) {
-      requestAnimationFrame(() => {
-        if (commentSectionRef.current) {
-          commentSectionRef.current.scrollIntoView({ behavior: "smooth" });
-        }
-      });
-    }
-
     const fetchPost = async () => {
       try {
         const data = await dispatch(getAPost(postId)).unwrap();
@@ -85,34 +68,41 @@ const PostMain = () => {
     });
   };
 
-  // useEffect(() => {
-  //   if (selectedUser !== "") {
-  //     const textarea = textAreaRef.current;
+  useEffect(() => {
+    if (commentNotf && !postLoading && currentPost?.comments) {
+      const el = commentRefs.current[commentNotf];
 
-  //     const currentValue = textarea.value;
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      el?.classList.add(
+        "bg-gradient-to-r",
+        "from-rose-50",
+        "via-purple-50",
+        "to-pink-50",
+        "shadow-lg",
+        "scale-[1.02]",
+        "transition-all",
+        "duration-100",
+        "ease-out",
+        "rounded-lg"
+      );
 
-  //     const newValue =
-  //       currentValue.substring(0, searchedUser.start + 1) + selectedUser + " ";
+      const timer = setTimeout(() => {
+        el?.classList.remove(
+          "bg-gradient-to-r",
+          "from-rose-50",
+          "via-purple-50",
+          "to-pink-50",
+          "shadow-lg",
+          "scale-[1.02]",
+          "rounded-lg"
+        );
 
-  //     textarea.value = newValue;
-  //     setComment(newValue);
+        navigate(location.pathname, { replace: true });
+      }, 800);
 
-  //     setShowUsers(false);
-  //     setSearchedUser((prev) => ({
-  //       ...prev,
-  //       start: -1,
-  //       user: "",
-  //     }));
-
-  //     textarea.focus();
-
-  //     const end = textarea.value.length;
-  //     textarea.selectionStart = end;
-  //     textarea.selectionEnd = end;
-
-  //     dispatch(setSelectedUser(""));
-  //   }
-  // }, [selectedUser]);
+      return () => clearTimeout(timer);
+    }
+  }, [postLoading, currentPost?.comments, commentNotf]);
 
   const handleAddComment = async (e) => {
     e.stopPropagation();
@@ -127,36 +117,6 @@ const PostMain = () => {
       toast.error(error || "Failed to create comment");
     }
     setComment("");
-  };
-
-  const handleCommentChange = (e) => {
-    const value = e.target.value;
-
-    const secondLastChar =
-      value.length > 1 ? value.charAt(value.length - 2) : "";
-
-    const lastChar = value.charAt(value.length - 1);
-
-    if (lastChar === "@" && (secondLastChar === " " || value.length === 1)) {
-      setShowUsers(true);
-      setSearchedUser((prev) => ({
-        ...prev,
-        start: value.length - 1,
-      }));
-    } else if (showUsers && (lastChar === " " || value.length === 0)) {
-      setShowUsers(false);
-      setSearchedUser((prev) => ({
-        ...prev,
-        start: -1,
-        user: "",
-      }));
-    } else if (showUsers) {
-      setSearchedUser((prev) => ({
-        ...prev,
-        user: value.substring(prev.start + 1),
-      }));
-    }
-    setComment(e.target.value);
   };
 
   if (postLoading) {
@@ -199,33 +159,37 @@ const PostMain = () => {
           <div className="lg:col-span-3">
             <div className="text-card-foreground bg-white border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
               <div className="p-8">
-                <div className="flex items-center gap-x-4 mb-6">
-                  <img
-                    src={currentPost.createdBy.profilePicture}
-                    alt="Profile Picture"
-                    className="w-16 h-16 rounded-full object-cover hover:opacity-90 cursor-pointer"
-                    onClick={(e) =>
-                      handleProfileClick(e, currentPost.createdBy)
-                    }
-                  />
-                  <div className="flex-1">
-                    <div className="flex space-x-2 text-gray-500 items-center">
-                      <span
-                        className="text-gray-800 font-semibold text-lg hover:underline cursor-pointer"
-                        onClick={(e) =>
-                          handleProfileClick(e, currentPost.createdBy)
-                        }
-                      >
-                        {currentPost.createdBy.displayName}
+                <div className="flex gap-x-4 mb-6 justify-between">
+                  <div className="flex flex-1 gap-x-4 items-center">
+                    <img
+                      src={currentPost.createdBy.profilePicture}
+                      alt="Profile Picture"
+                      className="w-16 h-16 rounded-full object-cover hover:opacity-90 cursor-pointer"
+                      onClick={(e) =>
+                        handleProfileClick(e, currentPost.createdBy)
+                      }
+                    />
+                    <div className="flex-1">
+                      <div className="flex space-x-2 text-gray-500 items-center">
+                        <span
+                          className="text-gray-800 font-semibold text-lg hover:underline cursor-pointer"
+                          onClick={(e) =>
+                            handleProfileClick(e, currentPost.createdBy)
+                          }
+                        >
+                          {currentPost.createdBy.displayName}
+                        </span>
+
+                        <span>@{currentPost.createdBy.username}</span>
+                      </div>
+
+                      <span className="text-gray-500">
+                        {getDateStamp(currentPost.createdAt)}
                       </span>
-
-                      <span className>@{currentPost.createdBy.username}</span>
                     </div>
-
-                    <span className="text-gray-500">
-                      {getDateStamp(currentPost.createdAt)}
-                    </span>
                   </div>
+
+                  <MoreOptions content={currentPost} mode="currentPost" />
                 </div>
 
                 <CarouselPosts
@@ -271,7 +235,7 @@ const PostMain = () => {
                     </button>
                   )}
                 </div>
-                <InteractionTab content={currentPost} />
+                <InteractionTab content={currentPost} postFocused={true} />
               </div>
             </div>
           </div>
@@ -292,16 +256,6 @@ const PostMain = () => {
                     />
 
                     <div className="flex-1 space-y-3">
-                      {/* <textarea
-                        ref={textAreaRef}
-                        value={comment}
-                        onChange={handleCommentChange}
-                        name="comment"
-                        id="comment"
-                        className="w-full resize-none flex min-h-[80px] border border-gray-300 rounded-lg px-3 py-2 text-sm"
-                        placeholder="Add a comment..."
-                        maxLength={300}
-                      ></textarea> */}
                       <ModifiedTextArea
                         value={comment}
                         setValue={setComment}
@@ -353,12 +307,6 @@ const PostMain = () => {
                   </div>
                 </div>
               </div>
-
-              {/* {showUsers && (
-                <div className="absolute inset-x-0 bottom-0 top-[100%] bg-gray-100 shadow-xl border-gray-300 border-1 h-60 w-full rounded-b-xl z-50 overflow-y-scroll">
-                  <SearchUsers searchedTerm={searchedUser.user} />
-                </div>
-              )} */}
             </div>
 
             <div className="flex flex-col bg-white space-y-6 rounded-xl shadow-sm ">
@@ -371,7 +319,7 @@ const PostMain = () => {
                 </h3>
               </div>
 
-              <div className="px-6 pb-2 space-y-6 max-h-[60rem] overflow-y-auto scrollbar">
+              <div className="px-6 pb-2 space-y-6 min-h-[10rem] max-h-[60rem] overflow-y-auto scrollbar">
                 {currentPost.comments.length === 0 ? (
                   <div className="w-full flex justify-center p-8">
                     <span className="text-gray-500">No comments here.</span>
@@ -379,6 +327,7 @@ const PostMain = () => {
                 ) : (
                   currentPost.comments.map((comment) => (
                     <ContentCard
+                      ref={(el) => (commentRefs.current[comment._id] = el)}
                       key={comment._id}
                       content={comment}
                       postId={postId}

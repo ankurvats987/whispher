@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
@@ -25,6 +25,10 @@ const ProfileDetail = ({ myProfile = false }) => {
 
   const followingLoading = useSelector((state) => state.user.loading.following);
   const followingError = useSelector((state) => state.user.error.following);
+
+  // useEffect(() => {
+  //   console.log(user.posts);
+  // }, [user.posts]);
 
   const loadFollowers = async () => {
     try {

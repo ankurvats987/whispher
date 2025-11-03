@@ -1,6 +1,7 @@
 import authMiddleware from "./authMiddleware.js";
 import { setCommentHandler } from "./commentHandler.js";
 import { setPostHandler } from "./postHandler.js";
+import { setUserHandler } from "./userHandler.js";
 
 export const userSocketMap = new Map();
 
@@ -15,6 +16,7 @@ const setupSocket = (io) => {
 
     setCommentHandler(io, socket, userSocketMap);
     setPostHandler(io, socket, userSocketMap);
+    setUserHandler(io, socket, userSocketMap);
 
     socket.on("disconnect", () => {
       console.log("Server. User disconnected: ", socket.id);

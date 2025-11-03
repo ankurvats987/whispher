@@ -83,37 +83,4 @@ postSchema.post(/^find/, async function (docs, next) {
   next();
 });
 
-// postSchema.query.withMoreInfo = async function () {
-//   const posts = await this.populate(
-//     "createdBy",
-//     "_id username displayName profilePicture"
-//   )
-//     .populate({
-//       path: "comments",
-//       options: { sort: { createdAt: -1 } },
-//       populate: {
-//         path: "createdBy",
-//         select: "_id username displayName profilePicture",
-//       },
-//     })
-//     .exec();
-
-//   if (!posts) return null;
-
-//   const process = async (post) => {
-//     const likes = await Likes.find({ postLiked: post._id }).select(
-//       "likedBy -_id"
-//     );
-//     const likedBy = likes.map((like) => like.likedBy);
-
-//     return { ...post.toObject(), likedBy };
-//   };
-
-//   if (Array.isArray(posts)) {
-//     return Promise.all(posts.map(process));
-//   }
-
-//   return process(posts);
-// };
-
 export const Post = mongoose.model("Post", postSchema);

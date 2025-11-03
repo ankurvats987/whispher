@@ -99,6 +99,13 @@ const userSlice = createSlice({
       state.user.notifications.unshift(action.payload);
       state.showRedCircle = true;
     },
+    deleteCurrentPost: (state, action) => {
+      if (state.currentUserData?.posts) {
+        state.currentUserData.posts = state.currentUserData.posts.filter(
+          (post) => post._id !== action.payload
+        );
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -282,5 +289,6 @@ export const {
   reset,
   setSelectedUser,
   addNotification,
+  deleteCurrentPost,
 } = userSlice.actions;
 export default userSlice.reducer;

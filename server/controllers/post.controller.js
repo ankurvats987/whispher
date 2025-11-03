@@ -1,13 +1,19 @@
+import mongoose from "mongoose";
 import { Comment } from "../models/comment.model.js";
 import { Follows } from "../models/follows.model.js";
 import { Likes } from "../models/likes.model.js";
+import { Notification } from "../models/notification.model.js";
 import { Post } from "../models/post.model.js";
 import { User } from "../models/user.model.js";
 import {
+  sendCommentLikeNotification,
   sendCommentMentionNotification,
   sendCommentNotification,
 } from "../sockets/commentHandler.js";
-import { sendPostMentionNotification } from "../sockets/postHandler.js";
+import {
+  sendPostLikeNotification,
+  sendPostMentionNotification,
+} from "../sockets/postHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary_uploader.js";
 import { APIResponse } from "../utils/res_handler.js";
 
@@ -74,18 +80,6 @@ const getFollowedPosts = async (req, res) => {
       createdBy: { $in: userIds },
     }).sort({ createdAt: -1 });
 
-    // const postsOfFollowing = (
-    //   await Promise.all(
-    //     followed.map(async (user) => {
-    //       const post = await Post.find({ createdBy: user._id }).sort({
-    //         createdAt: -1,
-    //       });
-
-    //       return post;
-    //     })
-    //   )
-    // ).flat();
-
     return APIResponse.success(
       "Followed Users",
       { posts: postsOfFollowing },
@@ -126,7 +120,6 @@ const createPost = async (req, res) => {
       ).filter(Boolean);
     }
     const newPost = await Post.create({ content, createdBy, images: urls });
-    // const post = await Post.findById(newPost._id).withMoreInfo();
 
     const post = await Post.findById(newPost._id);
 
@@ -158,13 +151,23 @@ const likePost = async (req, res) => {
   const postLiked = req.params.id;
 
   if (!likedBy || !postLiked) {
-    return APIResponse.error("Invalid post or user data", null, 404).send(res);
+    return APIResponse.error("Invalid post or user data", null, 400).send(res);
   }
 
   try {
+    const likedByUser = await User.findById(likedBy);
+
+    if (!likedByUser) {
+      return APIResponse.error("User not found", null, 400).send(res);
+    }
+
     await Likes.create({ likedBy, postLiked });
 
     const post = await Post.findById(postLiked);
+
+    if (!likedByUser._id.equals(post.createdBy._id)) {
+      sendPostLikeNotification(post, likedByUser, post.createdBy);
+    }
 
     return APIResponse.success(
       "Post liked successfully!",
@@ -198,6 +201,17 @@ const unlikePost = async (req, res) => {
     }
 
     const post = await Post.findById(postLiked);
+
+    const notfOptions = {
+      sender: new mongoose.Types.ObjectId(likedBy),
+      type: "like-post",
+      post: post._id,
+    };
+
+    const notf = await Notification.findOne(notfOptions);
+    if (notf) {
+      await Notification.findOneAndDelete(notfOptions);
+    }
 
     return APIResponse.success(
       "Post unliked successfully!",
@@ -236,7 +250,8 @@ const createComment = async (req, res) => {
       return APIResponse.error("Post not found", null, 404).send(res);
     }
 
-    sendCommentNotification(comment.createdBy, post, comment);
+    if (!post.createdBy._id.equals(comment.createdBy._id))
+      sendCommentNotification(comment.createdBy, post, comment);
 
     const parts = content.split(/(@\w+)/g);
 
@@ -246,12 +261,14 @@ const createComment = async (req, res) => {
           const username = part.substring(1);
           const user = await User.findOne({ username });
 
-          sendCommentMentionNotification(
-            post,
-            comment.createdBy,
-            user,
-            comment
-          );
+          if (!comment.createdBy._id.equals(user._id)) {
+            sendCommentMentionNotification(
+              post,
+              comment.createdBy,
+              user,
+              comment
+            );
+          }
         }
       })
     );
@@ -279,6 +296,12 @@ const likeComment = async (req, res) => {
       );
     }
 
+    const likedByUser = await User.findById(likedBy);
+
+    if (!likedByUser) {
+      return APIResponse.error("User not found", null, 400).send(res);
+    }
+
     const comment = await Comment.getComment(commentId);
 
     if (!comment) {
@@ -286,6 +309,17 @@ const likeComment = async (req, res) => {
     }
 
     await comment.like(likedBy);
+
+    const parentPost = await Post.findOne({ comments: comment._id });
+
+    if (!likedByUser._id.equals(comment.createdBy._id)) {
+      sendCommentLikeNotification(
+        parentPost,
+        likedByUser,
+        comment.createdBy,
+        comment
+      );
+    }
 
     return APIResponse.success(
       "Comment liked successfully!",
@@ -317,6 +351,17 @@ const unlikeComment = async (req, res) => {
     }
 
     await comment.unlike(likedBy);
+
+    const notfOptions = {
+      sender: new mongoose.Types.ObjectId(likedBy),
+      type: "like-comment",
+      comment: comment._id,
+    };
+
+    const notf = await Notification.findOne(notfOptions);
+    if (notf) {
+      await Notification.findOneAndDelete(notfOptions);
+    }
 
     return APIResponse.success(
       "Comment unliked successfully!",
@@ -350,8 +395,83 @@ const searchPost = async (req, res) => {
       200
     ).send(res);
   } catch (error) {
-    console.error("Search post error:", error?.message);
-    return APIResponse.error("Search post error", null, 500).send(res);
+    console.error("Search post error:", error);
+    return APIResponse.error("Search post error", error, 500).send(res);
+  }
+};
+
+const deletePost = async (req, res) => {
+  const postId = req.params.id || "";
+
+  if (!postId) return APIResponse.error("PostId is empty", null, 400).send(res);
+
+  try {
+    const post = await Post.findById(postId);
+
+    if (!post) return APIResponse.error("Post not found", null, 400).send(res);
+
+    // Clear Notifications related to that post
+    const notf = await Notification.find({ post: post._id });
+    if (notf.length > 0) {
+      await Notification.deleteMany({ post: post._id });
+    }
+
+    // Delete all comments under that post
+    if (post.comments?.length > 0) {
+      await Comment.deleteMany({ _id: { $in: post.comments } });
+    }
+
+    // Finallly, delete the post
+    await Post.findByIdAndDelete(post._id);
+
+    return APIResponse.success(
+      "Post deleted succcessfully",
+      { postId: post._id },
+      200
+    ).send(res);
+  } catch (error) {
+    console.error("Delete post error:", error);
+    return APIResponse.error("Delete post error:", error, 500).send(res);
+  }
+};
+
+const deleteComment = async (req, res) => {
+  const commentId = req.params.id || "";
+
+  if (!commentId) {
+    return APIResponse.error("CommentId is empty!", null, 400).send(res);
+  }
+
+  try {
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return APIResponse.error("Comment not found", null, 400).send(res);
+    }
+
+    // Delete notifications related to that comment
+    const notf = await Notification.find({ comment: comment._id });
+    if (notf.length > 0) {
+      await Notification.deleteMany({ comment: comment._id });
+    }
+
+    // Delete comment reference from it's parent post
+    const parentPost = await Post.findOne({ comments: comment._id });
+    await Post.updateOne(
+      { _id: parentPost._id },
+      { $pull: { comments: comment._id } }
+    );
+
+    // Finally, delete comment
+    await Comment.findByIdAndDelete(comment._id);
+
+    return APIResponse.success(
+      "Comment deleted succcessfully",
+      { postId: parentPost._id, commentId: comment._id },
+      200
+    ).send(res);
+  } catch (error) {
+    console.error("Delete comment error:", error);
+    return APIResponse.error("Delete comment error:", error, 500).send(res);
   }
 };
 
@@ -366,4 +486,6 @@ export {
   unlikeComment,
   unlikePost,
   searchPost,
+  deletePost,
+  deleteComment,
 };

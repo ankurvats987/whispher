@@ -9,7 +9,12 @@ import {
 } from "../features/post/postThunks";
 import { Button } from "./Button";
 
-const InteractionTab = ({ onlyLike = false, content, postId = null }) => {
+const InteractionTab = ({
+  onlyLike = false,
+  content,
+  postId = null,
+  postFocused = false,
+}) => {
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.user);
 
@@ -77,9 +82,9 @@ const InteractionTab = ({ onlyLike = false, content, postId = null }) => {
           viewBox="0 0 24 24"
           fill={contentLiked ? "red" : "none"}
           stroke={contentLiked ? "red" : "currentColor"}
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="lucide lucide-heart w-4 h-4 mr-2"
         >
           <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
@@ -94,10 +99,12 @@ const InteractionTab = ({ onlyLike = false, content, postId = null }) => {
               "h-9 px-3 text-gray-500 hover:text-purple-500 hover:bg-purple-50 rounded-xl text-sm"
             }
             onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/post/${content._id}`, {
-                state: { postId: content._Id, openComments: true },
-              });
+              if (!postFocused) {
+                e.stopPropagation();
+                navigate(`/post/${content._id}`, {
+                  state: { postId: content._Id, openComments: true },
+                });
+              }
             }}
           >
             <svg
@@ -107,9 +114,9 @@ const InteractionTab = ({ onlyLike = false, content, postId = null }) => {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="lucide lucide-message-circle w-4 h-4 mr-2"
             >
               <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
@@ -129,9 +136,9 @@ const InteractionTab = ({ onlyLike = false, content, postId = null }) => {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               className="lucide lucide-share w-4 h-4 mr-2"
             >
               <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>

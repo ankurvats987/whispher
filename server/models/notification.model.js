@@ -15,19 +15,19 @@ const notificationSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: [
-        "like",
+        "like-post",
+        "like-comment",
         "comment",
         "follow",
         "post-mention",
         "comment-mention",
-        "follow",
       ],
       required: true,
     },
     post: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Post",
-      required: true,
+      required: false,
     },
     comment: {
       type: mongoose.Schema.Types.ObjectId,
@@ -54,7 +54,7 @@ notificationSchema.statics.getNotification = async function (userId) {
         { path: "sender", select: "_id username displayName profilePicture" },
       ])
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(15);
 
     return notificaiton;
   } catch (error) {

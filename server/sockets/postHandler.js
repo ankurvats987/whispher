@@ -34,3 +34,28 @@ export const sendPostMentionNotification = async (post, sender, reciever) => {
     console.error("Failed to create post mention notification:", error);
   }
 };
+
+export const sendPostLikeNotification = async (post, sender, reciever) => {
+  try {
+    const targetSocket = userSocketMap.get(reciever._id.toString());
+
+    const notification = await Notification.create({
+      reciever: reciever._id,
+      sender: sender._id,
+      type: "like-post",
+      post: post._id,
+      message: `@${sender.username} liked your post.`,
+    });
+
+    await notification.populate([
+      { path: "reciever", select: "_id username displayName profilePicture" },
+      { path: "sender", select: "_id username displayName profilePicture" },
+    ]);
+
+    if (io && targetSocket) {
+      io.to(targetSocket).emit("notification", notification);
+    }
+  } catch (error) {
+    console.error("Failed to create post like notification:", error);
+  }
+};

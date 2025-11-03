@@ -1,0 +1,16 @@
+.custom-toast-container {
+  width: 350px !important;
+  max-width: 90vw;
+}
+
+.custom-toast-container .Toastify__toast {
+  min-height: 60px;
+  font-size: 14px;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.custom-toast-container .Toastify__toast-body {
+  padding: 8px;
+  font-size: 14px;
+}

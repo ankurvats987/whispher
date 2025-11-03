@@ -52,13 +52,16 @@ const FeedNav = () => {
 
     if (
       notification.type === "comment" ||
-      notification.type === "comment-mention"
+      notification.type === "comment-mention" ||
+      notification.type === "like-comment"
     ) {
       navigate(`/post/${notification.post}`, {
         state: {
           comment: notification.comment,
         },
       });
+    } else if (notification.type === "follow") {
+      navigate(`/profile/${notification.sender.username}`);
     } else {
       navigate(`/post/${notification.post}`);
     }
@@ -74,10 +77,6 @@ const FeedNav = () => {
       }
     } catch (error) {}
   };
-
-  // useEffect(() => {
-  //   if ()
-  // }, [notifications]);
 
   return (
     <header className="px-6 py-4 bg-white">
@@ -103,37 +102,16 @@ const FeedNav = () => {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-home w-4 h-4 mr-2"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-home w-4 h-4 mr-2"
               >
                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
               </svg>
               Home
             </NavLink>
-            {/* <button
-              class=" cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent h-10 px-4 py-2 text-gray-600 hover:text-gray-900 rounded-lg"
-              fdprocessedid="nx4dqd"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-compass w-4 h-4 mr-2"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-              </svg>
-              Explore
-            </button> */}
             <NavLink
               to={`/explore`}
               className={({ isActive }) =>
@@ -152,10 +130,10 @@ const FeedNav = () => {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-user w-4 h-4 mr-2"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-user w-4 h-4 mr-2"
               >
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
@@ -180,10 +158,10 @@ const FeedNav = () => {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-user w-4 h-4 mr-2"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-user w-4 h-4 mr-2"
               >
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
@@ -205,9 +183,9 @@ const FeedNav = () => {
                 height="24"
                 stroke="currentColor"
                 fill="none"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 className="w-6 h-6"
               >
                 <path d="M12 22a1.8 1.8 0 0 0 1.8-1.8H10.2A1.8 1.8 0 0 0 12 22zM18 16V10a6 6 0 1 0-12 0v6l-2 2h16l-2-2z" />
@@ -228,12 +206,18 @@ const FeedNav = () => {
               <div className="inline-flex items-center gap-2  bg-gradient-to-r from-rose-400 to-purple-400 text-white font-semibold w-full px-4 py-4 ">
                 Notifications
               </div>
-              <div className="w-full flex-1 flex items-center overflow-x-auto flex-col">
+              <div
+                className={`w-full flex-1 flex items-center overflow-x-auto flex-col ${
+                  (!notifications || notifications?.length === 0) &&
+                  "justify-center"
+                }`}
+              >
                 {notifications &&
                   (notifications.length > 0 ? (
-                    notifications.map((notification) => {
+                    notifications.slice(0, 15).map((notification) => {
                       return (
                         <div
+                          key={notification._id}
                           className="w-full h-10 border-b border-gray-200 flex items-center gap-4 cursor-pointer hover:bg-gray-100 px-4 py-8"
                           onClick={(e) =>
                             handleNotificationClick(e, notification)
@@ -289,10 +273,10 @@ const FeedNav = () => {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-search absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-search absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
             >
               <circle cx="11" cy="11" r="8"></circle>
               <path d="m21 21-4.3-4.3"></path>
@@ -319,10 +303,10 @@ const FeedNav = () => {
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="lucide lucide-log-out w-4 h-4"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-log-out w-4 h-4"
             >
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>

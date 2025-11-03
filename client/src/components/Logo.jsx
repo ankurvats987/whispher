@@ -1,8 +1,16 @@
 import React from "react";
+import { useLocation, useNavigate } from "react-router";
 
 export const Logo = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   return (
-    <div className="flex items-center space-x-2 text-xl font-semibold">
+    <div
+      className="flex items-center space-x-2 text-xl font-semibold cursor-pointer"
+      onClick={() => {
+        if (location.pathname !== "/feed") navigate("/feed");
+      }}
+    >
       {/* <div
         className="w-8 h-8 rounded-lg
       bg-gradient-to-r from-rose-400 to-purple-400 flex items-center justify-center"
