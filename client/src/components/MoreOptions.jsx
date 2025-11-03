@@ -26,6 +26,8 @@ const MoreOptions = ({ content, mode = "" }) => {
 
   const [open, setOpen] = useState(false);
 
+  console.log(currentUser.id, import.meta.env.VITE_ADMIN_ID);
+
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (
