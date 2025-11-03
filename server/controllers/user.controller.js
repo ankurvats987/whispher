@@ -6,6 +6,7 @@ import { Follows } from "../models/follows.model.js";
 import { Post } from "../models/post.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary_uploader.js";
 import nodemailer from "nodemailer";
+import { Notification } from "../models/notification.model.js";
 
 const setAuthTokens = async (userId, username, res) => {
   // Prepare the payload for access token
@@ -54,6 +55,9 @@ const setAuthTokens = async (userId, username, res) => {
 
   const userPosts = await Post.getUserPosts(userId);
   userToSend.posts = userPosts;
+
+  const notifications = await Notification.getNotification(userId);
+  userToSend.notifications = notifications;
 
   const responsePayload = { user: userToSend, accessToken };
 
@@ -1067,6 +1071,61 @@ const searchUser = async (req, res) => {
   }
 };
 
+const getUserNotifications = async (req, res) => {
+  try {
+    const username = req.params.username || "";
+
+    if (!username) {
+      return APIResponse.error("Username is required.", null, 400).send(res);
+    }
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return APIResponse.error("User not found", null, 404).send(res);
+    }
+
+    const notifications = Notification.getNotification(user._id);
+
+    return APIResponse.success(
+      "Notifications retrieved",
+      { notifications },
+      200
+    ).send(res);
+  } catch (error) {
+    console.error("Failed to retrieve user notifications:", error?.message);
+    return APIResponse.error("Search user error", null, 500).send(res);
+  }
+};
+
+const markNotificationsRead = async (req, res) => {
+  try {
+    const username = req.params.username || "";
+
+    if (!username) {
+      return APIResponse.error("Username is required.", null, 400).send(res);
+    }
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return APIResponse.error("User not found", null, 404).send(res);
+    }
+
+    await Notification.updateMany(
+      { reciever: user._id, read: false },
+      { $set: { read: true } }
+    );
+
+    return APIResponse.success("Notifications marked read", null, 200).send(
+      res
+    );
+  } catch (error) {
+    console.error("Failed to mark notifications read", error?.message);
+    return APIResponse.error("Search user error", null, 500).send(res);
+  }
+};
+
 export {
   createUser,
   loginUser,
@@ -1082,4 +1141,6 @@ export {
   verifyResetToken,
   updatePassword,
   searchUser,
+  getUserNotifications,
+  markNotificationsRead,
 };

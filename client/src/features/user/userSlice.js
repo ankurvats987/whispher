@@ -1,9 +1,11 @@
 import { createSlice, current } from "@reduxjs/toolkit";
 import {
   followUser,
+  getNotifications,
   getUserData,
   getUserFollowers,
   getUserFollowing,
+  markNotificationsRead,
   searchUser,
   unfollowUser,
   update,
@@ -26,6 +28,7 @@ const userSlice = createSlice({
       updatedAt: "",
       followersCount: 0,
       followingCount: 0,
+      notifications: [],
     },
     currentUserData: null,
     loading: {
@@ -35,6 +38,7 @@ const userSlice = createSlice({
       update: false,
       toggleFollow: false,
       searching: true,
+      notificaiton: true,
     },
     error: {
       profile: null,
@@ -42,9 +46,11 @@ const userSlice = createSlice({
       following: null,
       update: null,
       searching: null,
+      notificatiton: null,
     },
     searchedUser: [],
     selectedUser: "",
+    showRedCircle: false,
   },
   reducers: {
     setProfileData: (state, action) => {
@@ -64,7 +70,12 @@ const userSlice = createSlice({
         posts: userData.post || userData.posts || [],
         followersCount: userData.followersCount,
         followingCount: userData.followingCount,
+        notifications: userData.notifications,
       };
+
+      if (userData.notifications.some((notf) => !notf.read)) {
+        state.showRedCircle = true;
+      }
     },
     clearUserData: (state) => {
       state.user = {};
@@ -84,6 +95,10 @@ const userSlice = createSlice({
     setSelectedUser: (state, action) => {
       state.selectedUser = action?.payload || "";
     },
+    addNotification: (state, action) => {
+      state.user.notifications.unshift(action.payload);
+      state.showRedCircle = true;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -92,11 +107,6 @@ const userSlice = createSlice({
         state.error.profile = null;
 
         state.currentUserData = action.payload.user;
-
-        // if (state.currentUserData._id === state.user.id)
-        //   userSlice.caseReducers.setProfileData(state, {
-        //     payload: action.payload.user,
-        //   });
       })
       .addCase(getUserData.pending, (state) => {
         state.loading.profile = true;
@@ -234,20 +244,30 @@ const userSlice = createSlice({
 
         state.loading.searching = false;
         state.error.searching = null;
-
-        // console.log(current(state.searchedUser));
       })
       .addCase(searchUser.rejected, (state, action) => {
         state.loading.searching = false;
         state.error.searching = action.payload;
-
-        // console.log(current(state.searchedUser));
       })
-      .addCase(searchUser.pending, (state, action) => {
+      .addCase(searchUser.pending, (state, _) => {
         state.loading.searching = true;
         state.error.searching = null;
-
-        // console.log(current(state.searchedUser));
+      })
+      .addCase(getNotifications.pending, (state) => {
+        state.loading.notificaiton = true;
+        state.error.notificatiton = null;
+      })
+      .addCase(getNotifications.fulfilled, (state, action) => {
+        state.loading.notificaiton = false;
+        state.user.notifications = action.payload.notifications;
+        state.error.notificatiton = null;
+      })
+      .addCase(getNotifications.rejected, (state, action) => {
+        state.error.notificatiton = action.payload;
+        state.loading.notificaiton = false;
+      })
+      .addCase(markNotificationsRead.fulfilled, (state) => {
+        state.showRedCircle = false;
       });
   },
 });
@@ -256,6 +276,11 @@ export const amIFollowing = (state, user) => {
   return state.user.user.following.some((masters) => masters._id === user._id);
 };
 
-export const { setProfileData, clearUserData, reset, setSelectedUser } =
-  userSlice.actions;
+export const {
+  setProfileData,
+  clearUserData,
+  reset,
+  setSelectedUser,
+  addNotification,
+} = userSlice.actions;
 export default userSlice.reducer;

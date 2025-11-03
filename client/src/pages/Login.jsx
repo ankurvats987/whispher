@@ -9,12 +9,16 @@ import ErrorMessage from "../components/ErrorMessage";
 import { loginUser } from "../features/auth/authThunks";
 import ForgotPassword from "../components/ForgotPassword";
 import { toast } from "react-toastify";
+import { initializeSocket } from "../sockets";
 
 export const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const authLoading = useSelector((state) => state.auth.loading);
+
+  const token = useSelector((state) => state.auth.token);
+
   const from = location.state?.from?.pathname || "/feed";
 
   const { message, code } = location.state || {};

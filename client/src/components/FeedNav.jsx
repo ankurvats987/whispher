@@ -4,12 +4,22 @@ import { logoutUser } from "../features/auth/authThunks";
 import { Button } from "./Button";
 import { Logo } from "./Logo";
 import { useState } from "react";
+import { useEffect } from "react";
+import { useRef } from "react";
+import getDateStamp from "../helper/accurate_timestamp";
+import { markNotificationsRead } from "../features/user/userThunks";
 
 const FeedNav = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [query, setQuery] = useState("");
+
+  const [showNotification, setShowNotification] = useState(false);
+  const showRedCircle = useSelector((state) => state.user.showRedCircle);
+  const dropdownRef = useRef(null);
+
+  const notifications = useSelector((state) => state.user.user.notifications);
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
@@ -20,6 +30,54 @@ const FeedNav = () => {
   };
 
   const myProfile = useSelector((state) => state.user.user);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowNotification(false);
+      }
+    };
+
+    window.addEventListener("click", handleOutsideClick);
+    window.addEventListener("touchstart", handleOutsideClick);
+
+    return () => {
+      window.removeEventListener("click", handleOutsideClick);
+      window.removeEventListener("touchstart", handleOutsideClick);
+    };
+  }, []);
+
+  const handleNotificationClick = (e, notification) => {
+    e.stopPropagation();
+
+    if (
+      notification.type === "comment" ||
+      notification.type === "comment-mention"
+    ) {
+      navigate(`/post/${notification.post}`, {
+        state: {
+          comment: notification.comment,
+        },
+      });
+    } else {
+      navigate(`/post/${notification.post}`);
+    }
+  };
+
+  const handleBellClick = async (e) => {
+    e.stopPropagation();
+    setShowNotification((prev) => !prev);
+
+    try {
+      if (showRedCircle) {
+        await dispatch(markNotificationsRead()).unwrap();
+      }
+    } catch (error) {}
+  };
+
+  // useEffect(() => {
+  //   if ()
+  // }, [notifications]);
 
   return (
     <header className="px-6 py-4 bg-white">
@@ -135,6 +193,94 @@ const FeedNav = () => {
           </nav>
         </div>
         <div className="flex space-x-8 items-center">
+          <div className="relative">
+            <button
+              className="h-10 px-4 py-2 text-gray-600 hover:text-gray-900 rounded-lg cursor-pointer transition-transform duration-300 hover:scale-110"
+              onClick={handleBellClick}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                stroke="currentColor"
+                fill="none"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                className="w-6 h-6"
+              >
+                <path d="M12 22a1.8 1.8 0 0 0 1.8-1.8H10.2A1.8 1.8 0 0 0 12 22zM18 16V10a6 6 0 1 0-12 0v6l-2 2h16l-2-2z" />
+                {showRedCircle && (
+                  <circle cx="18.5" cy="5.5" r="4" fill="#ff3b30" />
+                )}
+              </svg>
+            </button>
+
+            <div
+              ref={dropdownRef}
+              className={`flex flex-col  items-center absolute bottom-0 top-full left-4 w-[450px] h-80  bg-gray-50 rounded-lg shadow-lg border border-gray-200 z-[100] transition-all duration-200 ease-in-out ${
+                showNotification
+                  ? "opacity-100 translate-y-2"
+                  : "opacity-0 -translate-y-2 pointer-events-none"
+              } `}
+            >
+              <div className="inline-flex items-center gap-2  bg-gradient-to-r from-rose-400 to-purple-400 text-white font-semibold w-full px-4 py-4 ">
+                Notifications
+              </div>
+              <div className="w-full flex-1 flex items-center overflow-x-auto flex-col">
+                {notifications &&
+                  (notifications.length > 0 ? (
+                    notifications.map((notification) => {
+                      return (
+                        <div
+                          className="w-full h-10 border-b border-gray-200 flex items-center gap-4 cursor-pointer hover:bg-gray-100 px-4 py-8"
+                          onClick={(e) =>
+                            handleNotificationClick(e, notification)
+                          }
+                        >
+                          <div className="relative flex items-center justify-center flex-shrink-0">
+                            <img
+                              src={notification.sender.profilePicture}
+                              alt={`${notification.sender._id}-sender-pfp`}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          </div>
+
+                          <div className="flex flex-col flex-1 gap-y-1 min-w-0">
+                            <span className="text-sm text-black leading-snug break-words">
+                              {notification.message
+                                .split(/(@\w+)/g)
+                                .map((part, i) =>
+                                  part.startsWith("@") ? (
+                                    <span
+                                      key={i}
+                                      className="font-bold text-gray-950"
+                                    >
+                                      {part}
+                                    </span>
+                                  ) : (
+                                    part
+                                  )
+                                )}
+                            </span>
+
+                            <span className="block text-xs text-gray-500">
+                              {getDateStamp(notification.createdAt)}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <span className="text-md text-gray-500">
+                      No new notifications.
+                    </span>
+                  ))}
+              </div>
+            </div>
+          </div>
+
           <div className="relative cursor-text">
             <svg
               xmlns="http://www.w3.org/2000/svg"

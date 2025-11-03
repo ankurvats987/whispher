@@ -3,6 +3,11 @@ import { Follows } from "../models/follows.model.js";
 import { Likes } from "../models/likes.model.js";
 import { Post } from "../models/post.model.js";
 import { User } from "../models/user.model.js";
+import {
+  sendCommentMentionNotification,
+  sendCommentNotification,
+} from "../sockets/commentHandler.js";
+import { sendPostMentionNotification } from "../sockets/postHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary_uploader.js";
 import { APIResponse } from "../utils/res_handler.js";
 
@@ -125,6 +130,19 @@ const createPost = async (req, res) => {
 
     const post = await Post.findById(newPost._id);
 
+    const parts = content.split(/(@\w+)/g);
+
+    await Promise.all(
+      parts.map(async (part) => {
+        if (part.startsWith("@")) {
+          const username = part.substring(1);
+          const user = await User.findOne({ username });
+
+          sendPostMentionNotification(post, post.createdBy, user);
+        }
+      })
+    );
+
     return APIResponse.success("Post created successfully!", post, 200).send(
       res
     );
@@ -217,6 +235,26 @@ const createComment = async (req, res) => {
     if (!post) {
       return APIResponse.error("Post not found", null, 404).send(res);
     }
+
+    sendCommentNotification(comment.createdBy, post, comment);
+
+    const parts = content.split(/(@\w+)/g);
+
+    await Promise.all(
+      parts.map(async (part) => {
+        if (part.startsWith("@")) {
+          const username = part.substring(1);
+          const user = await User.findOne({ username });
+
+          sendCommentMentionNotification(
+            post,
+            comment.createdBy,
+            user,
+            comment
+          );
+        }
+      })
+    );
 
     return APIResponse.success(
       "Comment successfully created!",

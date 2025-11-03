@@ -4,6 +4,8 @@ import {
   getFollowers,
   getFollowing,
   getUser,
+  markNotifications,
+  notifications,
   search,
   unfollow,
   updateProfile,
@@ -19,9 +21,7 @@ export const getUserData = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while fetching user data";
+      const errMsg = error || "Something went wrong while fetching user data";
 
       console.error("Error in fetching user data:", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -38,8 +38,7 @@ export const getUserFollowers = createAsyncThunk(
       return response.data.data;
     } catch (error) {
       const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while fetching all the followers";
+        error || "Something went wrong while fetching all the followers";
 
       console.error("Error in fetching the followers", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -56,8 +55,7 @@ export const getUserFollowing = createAsyncThunk(
       return response.data.data;
     } catch (error) {
       const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while fetching all the following";
+        error || "Something went wrong while fetching all the following";
 
       console.error("Error in fetching the following", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -78,9 +76,7 @@ export const followUser = createAsyncThunk(
 
       return user;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while following";
+      const errMsg = error || "Something went wrong while following";
 
       console.error("Error in following", errMsg);
       return thunkAPI.rejectWithValue({
@@ -104,9 +100,7 @@ export const unfollowUser = createAsyncThunk(
 
       return user.username;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while unfollowing";
+      const errMsg = error || "Something went wrong while unfollowing";
 
       console.error("Error in unfollowing", errMsg);
       return thunkAPI.rejectWithValue({
@@ -130,9 +124,7 @@ export const update = createAsyncThunk(
 
       return response.data.data;
     } catch (error) {
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while updating the profile";
+      const errMsg = error || "Something went wrong while updating the profile";
 
       console.error("Error in updating profile", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
@@ -152,11 +144,45 @@ export const searchUser = createAsyncThunk(
         return thunkAPI.fulfillWithValue([]);
       }
 
-      const errMsg =
-        error?.response?.data?.message ||
-        "Something went wrong while searching";
+      const errMsg = error || "Something went wrong while searching";
 
       console.error("Error in search user", errMsg);
+      return thunkAPI.rejectWithValue(errMsg);
+    }
+  }
+);
+
+export const getNotifications = createAsyncThunk(
+  "/user/notification/username",
+  async (username, thunkAPI) => {
+    try {
+      const response = await notifications(username);
+
+      return response.data.data;
+    } catch (error) {
+      const errMsg =
+        error || "Something went wrong while getting notifications";
+
+      console.error("Error in getting notifications", errMsg);
+      return thunkAPI.rejectWithValue(errMsg);
+    }
+  }
+);
+
+export const markNotificationsRead = createAsyncThunk(
+  "/user/notification/username/mark-all",
+  async (_, thunkAPI) => {
+    try {
+      const state = thunkAPI.getState();
+
+      const username = state.user.user.username;
+
+      await markNotifications(username);
+    } catch (error) {
+      const errMsg =
+        error || "Something went wrong while marking notifications";
+
+      console.error("Error in marking notifications", errMsg);
       return thunkAPI.rejectWithValue(errMsg);
     }
   }

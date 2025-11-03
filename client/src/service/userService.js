@@ -28,6 +28,14 @@ export const updateProfile = async (username, data) => {
   });
 };
 
+export const notifications = async (username) => {
+  return await api.get(`/user/notification/${username}`);
+};
+
+export const markNotifications = async (username) => {
+  return await api.post(`/user/notification/${username}/mark-all`);
+};
+
 export const search = async (key, signal) => {
   return signal
     ? await api.get(`/user/search/${key}`, { signal })

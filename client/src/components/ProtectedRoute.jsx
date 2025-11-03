@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router";
 import { refreshAccessToken } from "../features/auth/authThunks";
+import { initializeSocket } from "../sockets";
 
 const ProtectedRoute = () => {
   const accessToken = useSelector((state) => state.auth.token);
@@ -23,6 +24,12 @@ const ProtectedRoute = () => {
       setHasTriedRefresh(true);
     }
   }, [accessToken, dispatch, hasTriedRefresh]);
+
+  useEffect(() => {
+    if (accessToken) {
+      initializeSocket(accessToken);
+    }
+  }, [accessToken]);
 
   if (!hasTriedRefresh || loading) {
     return (

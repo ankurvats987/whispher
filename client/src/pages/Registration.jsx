@@ -7,11 +7,14 @@ import { clearAuthError } from "../features/auth/authSlice";
 import ErrorMessage from "../components/ErrorMessage";
 import { useEffect, useRef, useState } from "react";
 import { registerUser } from "../features/auth/authThunks";
+import { initializeSocket } from "../sockets";
 
 export const Registration = () => {
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const dispatch = useDispatch();
+
+  const token = useSelector((state) => state.auth.token);
   const authLoading = useSelector((state) => state.auth.loading);
 
   const navigate = useNavigate();

@@ -5,8 +5,10 @@ import {
   getFollowers,
   getFollowing,
   getUserData,
+  getUserNotifications,
   loginUser,
   logoutUser,
+  markNotificationsRead,
   refreshToken,
   resetPassword,
   searchUser,
@@ -42,5 +44,10 @@ userRouter.route("/reset/update").post(updatePassword);
 
 userRouter.route("/search").get(searchUser);
 userRouter.route("/search/:key").get(searchUser);
+
+userRouter.route("/notification/:username").get(getUserNotifications);
+userRouter
+  .route("/notification/:username/mark-all")
+  .post(markNotificationsRead);
 
 export default userRouter;

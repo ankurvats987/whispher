@@ -5,8 +5,9 @@ import express from "express";
 import { authenticate } from "./middlewares/authenticate.middleware.js";
 import postRouter from "./routes/post.route.js";
 import userRouter from "./routes/user.route.js";
-import http, { Server } from "http";
+import http from "http";
 import setupSocket from "./sockets/index.js";
+import { Server } from "socket.io";
 
 dotenv.config({
   path: "./.env",
