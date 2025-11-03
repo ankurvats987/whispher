@@ -42,7 +42,7 @@ postSchema.set("toObject", { virtuals: true });
 postSchema.set("toJSON", { virtuals: true });
 
 postSchema.statics.getUserPosts = async function (userId) {
-  const posts = await this.find({ createdBy: userId });
+  const posts = await this.find({ createdBy: userId }).sort({ createdAt: -1 });
 
   return posts;
 };
