@@ -1,4 +1,4 @@
-import { createSlice, current } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import {
   followUser,
   getNotifications,
@@ -10,6 +10,7 @@ import {
   unfollowUser,
   update,
 } from "./userThunks";
+import { toast } from "react-toastify";
 
 const userSlice = createSlice({
   name: "user",
@@ -98,6 +99,10 @@ const userSlice = createSlice({
     addNotification: (state, action) => {
       state.user.notifications.unshift(action.payload);
       state.showRedCircle = true;
+
+      toast.success("You have a new notification", {
+        icon: false,
+      });
     },
     deleteCurrentPost: (state, action) => {
       if (state.currentUserData?.posts) {
